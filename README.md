@@ -14,12 +14,17 @@
 ### 启动项目
 在项目根目录下，使用 Python 内置的 HTTP 服务器模块启动：
 ```bash
-python3 -m http.server 8080
+python3 -m http.server 5777
 ```
-启动成功后，打开浏览器访问 [http://localhost:8080](http://localhost:8080)。
+启动成功后，打开浏览器访问 [http://localhost:5777](http://localhost:5777)。
 
 ### 停止项目
 在运行上述命令的终端窗口中，按下 `Ctrl + C` 即可中止进程并停止服务器。
+
+如果出现端口占用，可以通过以下命令强制停止占用 `5777` 端口的进程：
+```bash
+kill -9 $(lsof -t -i:5777)
+```
 
 ## 文件与函数说明
 
