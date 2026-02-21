@@ -1,0 +1,1224 @@
+{
+  "format": "cg_edge_export",
+  "version": "1.0",
+  "meta": {
+    "unit": "mm",
+    "coord_system": "right_handed",
+    "point_merge_tolerance": 1e-6,
+    "note": "Complex test case with discretized NURBS-like curves, reversed overlap edges, and connector edges."
+  },
+  "points": [
+    {
+      "id": "P001",
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.5
+    },
+    {
+      "id": "P002",
+      "x": 0.4,
+      "y": 0.2,
+      "z": 0.49
+    },
+    {
+      "id": "P003",
+      "x": 0.8,
+      "y": 0.39,
+      "z": 0.46
+    },
+    {
+      "id": "P004",
+      "x": 1.2,
+      "y": 0.56,
+      "z": 0.41
+    },
+    {
+      "id": "P005",
+      "x": 1.6,
+      "y": 0.72,
+      "z": 0.35
+    },
+    {
+      "id": "P006",
+      "x": 2.0,
+      "y": 0.84,
+      "z": 0.27
+    },
+    {
+      "id": "P007",
+      "x": 2.4,
+      "y": 0.93,
+      "z": 0.18
+    },
+    {
+      "id": "P008",
+      "x": 2.8,
+      "y": 0.98,
+      "z": 0.08
+    },
+    {
+      "id": "P009",
+      "x": 3.2,
+      "y": 1.0,
+      "z": -0.02
+    },
+    {
+      "id": "P010",
+      "x": 3.6,
+      "y": 0.97,
+      "z": -0.12
+    },
+    {
+      "id": "P011",
+      "x": 4.0,
+      "y": 0.91,
+      "z": -0.21
+    },
+    {
+      "id": "P012",
+      "x": 4.4,
+      "y": 0.81,
+      "z": -0.3
+    },
+    {
+      "id": "P013",
+      "x": 4.8,
+      "y": 0.68,
+      "z": -0.37
+    },
+    {
+      "id": "P014",
+      "x": 5.2,
+      "y": 0.52,
+      "z": -0.43
+    },
+    {
+      "id": "P015",
+      "x": 5.6,
+      "y": 0.33,
+      "z": -0.47
+    },
+    {
+      "id": "P016",
+      "x": 6.0,
+      "y": 0.14,
+      "z": -0.49
+    },
+    {
+      "id": "P017",
+      "x": 6.4,
+      "y": -0.06,
+      "z": -0.5
+    },
+    {
+      "id": "P018",
+      "x": 6.8,
+      "y": -0.25,
+      "z": -0.48
+    },
+    {
+      "id": "P019",
+      "x": 7.2,
+      "y": -0.44,
+      "z": -0.45
+    },
+    {
+      "id": "P020",
+      "x": 7.6,
+      "y": -0.61,
+      "z": -0.39
+    },
+    {
+      "id": "P021",
+      "x": 8.0,
+      "y": -0.76,
+      "z": -0.32
+    },
+    {
+      "id": "P022",
+      "x": 8.4,
+      "y": -0.87,
+      "z": -0.24
+    },
+    {
+      "id": "P023",
+      "x": 8.8,
+      "y": -0.95,
+      "z": -0.15
+    },
+    {
+      "id": "P024",
+      "x": 9.2,
+      "y": -0.99,
+      "z": -0.05
+    },
+    {
+      "id": "P025",
+      "x": 9.6,
+      "y": -1.0,
+      "z": 0.05
+    },
+    {
+      "id": "P026",
+      "x": 10.0,
+      "y": -0.96,
+      "z": 0.15
+    },
+    {
+      "id": "P027",
+      "x": 10.4,
+      "y": -0.88,
+      "z": 0.24
+    },
+    {
+      "id": "P028",
+      "x": 10.8,
+      "y": -0.77,
+      "z": 0.32
+    },
+    {
+      "id": "P029",
+      "x": 11.2,
+      "y": -0.62,
+      "z": 0.39
+    },
+    {
+      "id": "P030",
+      "x": 11.6,
+      "y": -0.45,
+      "z": 0.45
+    },
+    {
+      "id": "P031",
+      "x": -4.0,
+      "y": 2.0,
+      "z": 1.2
+    },
+    {
+      "id": "P032",
+      "x": -3.65,
+      "y": 2.28,
+      "z": 1.15
+    },
+    {
+      "id": "P033",
+      "x": -3.3,
+      "y": 2.54,
+      "z": 1.01
+    },
+    {
+      "id": "P034",
+      "x": -2.95,
+      "y": 2.76,
+      "z": 0.8
+    },
+    {
+      "id": "P035",
+      "x": -2.6,
+      "y": 2.92,
+      "z": 0.53
+    },
+    {
+      "id": "P036",
+      "x": -2.25,
+      "y": 3.0,
+      "z": 0.24
+    },
+    {
+      "id": "P037",
+      "x": -1.9,
+      "y": 2.99,
+      "z": -0.06
+    },
+    {
+      "id": "P038",
+      "x": -1.55,
+      "y": 2.89,
+      "z": -0.35
+    },
+    {
+      "id": "P039",
+      "x": -1.2,
+      "y": 2.7,
+      "z": -0.6
+    },
+    {
+      "id": "P040",
+      "x": -0.85,
+      "y": 2.43,
+      "z": -0.81
+    },
+    {
+      "id": "P041",
+      "x": -0.5,
+      "y": 2.11,
+      "z": -0.95
+    },
+    {
+      "id": "P042",
+      "x": -0.15,
+      "y": 1.75,
+      "z": -1.02
+    },
+    {
+      "id": "P043",
+      "x": 0.2,
+      "y": 1.38,
+      "z": -1.01
+    },
+    {
+      "id": "P044",
+      "x": 0.55,
+      "y": 1.02,
+      "z": -0.93
+    },
+    {
+      "id": "P045",
+      "x": 0.9,
+      "y": 0.7,
+      "z": -0.78
+    },
+    {
+      "id": "P046",
+      "x": 1.25,
+      "y": 0.43,
+      "z": -0.58
+    },
+    {
+      "id": "P047",
+      "x": 1.6,
+      "y": 0.24,
+      "z": -0.35
+    },
+    {
+      "id": "P048",
+      "x": 1.95,
+      "y": 0.14,
+      "z": -0.1
+    },
+    {
+      "id": "P049",
+      "x": 2.3,
+      "y": 0.13,
+      "z": 0.16
+    },
+    {
+      "id": "P050",
+      "x": 2.65,
+      "y": 0.21,
+      "z": 0.41
+    },
+    {
+      "id": "P051",
+      "x": 3.0,
+      "y": 0.37,
+      "z": 0.63
+    },
+    {
+      "id": "P052",
+      "x": 3.35,
+      "y": 0.59,
+      "z": 0.82
+    },
+    {
+      "id": "P053",
+      "x": 3.7,
+      "y": 0.85,
+      "z": 0.95
+    },
+    {
+      "id": "P054",
+      "x": 4.05,
+      "y": 1.13,
+      "z": 1.02
+    },
+    {
+      "id": "P055",
+      "x": 4.4,
+      "y": 1.4,
+      "z": 1.01
+    },
+    {
+      "id": "P056",
+      "x": 4.75,
+      "y": 1.64,
+      "z": 0.93
+    },
+    {
+      "id": "P057",
+      "x": 5.1,
+      "y": 1.83,
+      "z": 0.79
+    },
+    {
+      "id": "P058",
+      "x": 5.45,
+      "y": 1.95,
+      "z": 0.59
+    },
+    {
+      "id": "P059",
+      "x": 5.8,
+      "y": 2.0,
+      "z": 0.36
+    },
+    {
+      "id": "P060",
+      "x": 6.15,
+      "y": 1.97,
+      "z": 0.11
+    },
+    {
+      "id": "P061",
+      "x": 3.8,
+      "y": -3.0,
+      "z": -1.5
+    },
+    {
+      "id": "P062",
+      "x": 3.74,
+      "y": -2.64,
+      "z": -1.4
+    },
+    {
+      "id": "P063",
+      "x": 3.57,
+      "y": -2.32,
+      "z": -1.3
+    },
+    {
+      "id": "P064",
+      "x": 3.31,
+      "y": -2.07,
+      "z": -1.2
+    },
+    {
+      "id": "P065",
+      "x": 2.98,
+      "y": -1.91,
+      "z": -1.1
+    },
+    {
+      "id": "P066",
+      "x": 2.62,
+      "y": -1.85,
+      "z": -1.0
+    },
+    {
+      "id": "P067",
+      "x": 2.27,
+      "y": -1.9,
+      "z": -0.9
+    },
+    {
+      "id": "P068",
+      "x": 1.97,
+      "y": -2.05,
+      "z": -0.8
+    },
+    {
+      "id": "P069",
+      "x": 1.74,
+      "y": -2.29,
+      "z": -0.7
+    },
+    {
+      "id": "P070",
+      "x": 1.61,
+      "y": -2.59,
+      "z": -0.6
+    },
+    {
+      "id": "P071",
+      "x": 1.58,
+      "y": -2.93,
+      "z": -0.5
+    },
+    {
+      "id": "P072",
+      "x": 1.66,
+      "y": -3.29,
+      "z": -0.4
+    },
+    {
+      "id": "P073",
+      "x": 1.84,
+      "y": -3.64,
+      "z": -0.3
+    },
+    {
+      "id": "P074",
+      "x": 2.1,
+      "y": -3.94,
+      "z": -0.2
+    },
+    {
+      "id": "P075",
+      "x": 2.43,
+      "y": -4.18,
+      "z": -0.1
+    },
+    {
+      "id": "P076",
+      "x": 2.79,
+      "y": -4.33,
+      "z": 0.0
+    },
+    {
+      "id": "P077",
+      "x": 3.15,
+      "y": -4.38,
+      "z": 0.1
+    },
+    {
+      "id": "P078",
+      "x": 3.47,
+      "y": -4.32,
+      "z": 0.2
+    },
+    {
+      "id": "P079",
+      "x": 3.72,
+      "y": -4.16,
+      "z": 0.3
+    },
+    {
+      "id": "P080",
+      "x": 3.89,
+      "y": -3.91,
+      "z": 0.4
+    },
+    {
+      "id": "P081",
+      "x": 3.96,
+      "y": -3.59,
+      "z": 0.5
+    },
+    {
+      "id": "P082",
+      "x": 3.93,
+      "y": -3.23,
+      "z": 0.6
+    },
+    {
+      "id": "P083",
+      "x": 3.8,
+      "y": -2.88,
+      "z": 0.7
+    },
+    {
+      "id": "P084",
+      "x": 3.58,
+      "y": -2.53,
+      "z": 0.8
+    },
+    {
+      "id": "P085",
+      "x": 3.28,
+      "y": -2.24,
+      "z": 0.9
+    },
+    {
+      "id": "P086",
+      "x": 2.93,
+      "y": -2.02,
+      "z": 1.0
+    },
+    {
+      "id": "P087",
+      "x": 2.56,
+      "y": -1.88,
+      "z": 1.1
+    },
+    {
+      "id": "P088",
+      "x": 2.21,
+      "y": -1.84,
+      "z": 1.2
+    },
+    {
+      "id": "P089",
+      "x": 1.9,
+      "y": -1.89,
+      "z": 1.3
+    },
+    {
+      "id": "P090",
+      "x": 1.67,
+      "y": -2.03,
+      "z": 1.4
+    },
+    {
+      "id": "P091",
+      "x": 8.2,
+      "y": 0.2,
+      "z": 0.8
+    },
+    {
+      "id": "P092",
+      "x": 6.7,
+      "y": 1.1,
+      "z": 1.1
+    },
+    {
+      "id": "P093",
+      "x": 5.4,
+      "y": 1.45,
+      "z": 0.7
+    },
+    {
+      "id": "P094",
+      "x": 4.2,
+      "y": 0.6,
+      "z": 0.15
+    },
+    {
+      "id": "P095",
+      "x": 3.5,
+      "y": -1.1,
+      "z": -0.55
+    }
+  ],
+  "edges": [
+    {
+      "id": "E4001",
+      "point_ids": [
+        "P001",
+        "P002",
+        "P003",
+        "P004",
+        "P005",
+        "P006",
+        "P007",
+        "P008",
+        "P009",
+        "P010",
+        "P011",
+        "P012",
+        "P013",
+        "P014",
+        "P015",
+        "P016",
+        "P017",
+        "P018",
+        "P019",
+        "P020",
+        "P021",
+        "P022",
+        "P023",
+        "P024",
+        "P025",
+        "P026",
+        "P027",
+        "P028",
+        "P029",
+        "P030"
+      ],
+      "start_point_id": "P001",
+      "end_point_id": "P030",
+      "type": "polyline",
+      "curve_hint": {
+        "kind": "nurbs_discrete",
+        "degree": 3,
+        "sample_count": 30
+      },
+      "connected_edges": [
+        {
+          "edge_id": "E4002",
+          "via_point_id": "P001",
+          "self_at": "start",
+          "other_at": "end"
+        },
+        {
+          "edge_id": "E4002",
+          "via_point_id": "P030",
+          "self_at": "end",
+          "other_at": "start"
+        },
+        {
+          "edge_id": "E4007",
+          "via_point_id": "P030",
+          "self_at": "end",
+          "other_at": "start"
+        },
+        {
+          "edge_id": "E4008",
+          "via_point_id": "P030",
+          "self_at": "end",
+          "other_at": "end"
+        }
+      ]
+    },
+    {
+      "id": "E4002",
+      "point_ids": [
+        "P030",
+        "P029",
+        "P028",
+        "P027",
+        "P026",
+        "P025",
+        "P024",
+        "P023",
+        "P022",
+        "P021",
+        "P020",
+        "P019",
+        "P018",
+        "P017",
+        "P016",
+        "P015",
+        "P014",
+        "P013",
+        "P012",
+        "P011",
+        "P010",
+        "P009",
+        "P008",
+        "P007",
+        "P006",
+        "P005",
+        "P004",
+        "P003",
+        "P002",
+        "P001"
+      ],
+      "start_point_id": "P030",
+      "end_point_id": "P001",
+      "type": "polyline",
+      "curve_hint": {
+        "kind": "nurbs_discrete",
+        "degree": 3,
+        "sample_count": 30
+      },
+      "connected_edges": [
+        {
+          "edge_id": "E4001",
+          "via_point_id": "P030",
+          "self_at": "start",
+          "other_at": "end"
+        },
+        {
+          "edge_id": "E4001",
+          "via_point_id": "P001",
+          "self_at": "end",
+          "other_at": "start"
+        },
+        {
+          "edge_id": "E4007",
+          "via_point_id": "P030",
+          "self_at": "start",
+          "other_at": "start"
+        },
+        {
+          "edge_id": "E4008",
+          "via_point_id": "P030",
+          "self_at": "start",
+          "other_at": "end"
+        }
+      ]
+    },
+    {
+      "id": "E4003",
+      "point_ids": [
+        "P031",
+        "P032",
+        "P033",
+        "P034",
+        "P035",
+        "P036",
+        "P037",
+        "P038",
+        "P039",
+        "P040",
+        "P041",
+        "P042",
+        "P043",
+        "P044",
+        "P045",
+        "P046",
+        "P047",
+        "P048",
+        "P049",
+        "P050",
+        "P051",
+        "P052",
+        "P053",
+        "P054",
+        "P055",
+        "P056",
+        "P057",
+        "P058",
+        "P059",
+        "P060"
+      ],
+      "start_point_id": "P031",
+      "end_point_id": "P060",
+      "type": "polyline",
+      "curve_hint": {
+        "kind": "nurbs_discrete",
+        "degree": 3,
+        "sample_count": 30
+      },
+      "connected_edges": [
+        {
+          "edge_id": "E4004",
+          "via_point_id": "P031",
+          "self_at": "start",
+          "other_at": "end"
+        },
+        {
+          "edge_id": "E4004",
+          "via_point_id": "P060",
+          "self_at": "end",
+          "other_at": "start"
+        },
+        {
+          "edge_id": "E4007",
+          "via_point_id": "P031",
+          "self_at": "start",
+          "other_at": "end"
+        },
+        {
+          "edge_id": "E4008",
+          "via_point_id": "P031",
+          "self_at": "start",
+          "other_at": "start"
+        },
+        {
+          "edge_id": "E4009",
+          "via_point_id": "P060",
+          "self_at": "end",
+          "other_at": "start"
+        },
+        {
+          "edge_id": "E4010",
+          "via_point_id": "P060",
+          "self_at": "end",
+          "other_at": "end"
+        }
+      ]
+    },
+    {
+      "id": "E4004",
+      "point_ids": [
+        "P060",
+        "P059",
+        "P058",
+        "P057",
+        "P056",
+        "P055",
+        "P054",
+        "P053",
+        "P052",
+        "P051",
+        "P050",
+        "P049",
+        "P048",
+        "P047",
+        "P046",
+        "P045",
+        "P044",
+        "P043",
+        "P042",
+        "P041",
+        "P040",
+        "P039",
+        "P038",
+        "P037",
+        "P036",
+        "P035",
+        "P034",
+        "P033",
+        "P032",
+        "P031"
+      ],
+      "start_point_id": "P060",
+      "end_point_id": "P031",
+      "type": "polyline",
+      "curve_hint": {
+        "kind": "nurbs_discrete",
+        "degree": 3,
+        "sample_count": 30
+      },
+      "connected_edges": [
+        {
+          "edge_id": "E4003",
+          "via_point_id": "P060",
+          "self_at": "start",
+          "other_at": "end"
+        },
+        {
+          "edge_id": "E4003",
+          "via_point_id": "P031",
+          "self_at": "end",
+          "other_at": "start"
+        },
+        {
+          "edge_id": "E4007",
+          "via_point_id": "P031",
+          "self_at": "end",
+          "other_at": "end"
+        },
+        {
+          "edge_id": "E4008",
+          "via_point_id": "P031",
+          "self_at": "end",
+          "other_at": "start"
+        },
+        {
+          "edge_id": "E4009",
+          "via_point_id": "P060",
+          "self_at": "start",
+          "other_at": "start"
+        },
+        {
+          "edge_id": "E4010",
+          "via_point_id": "P060",
+          "self_at": "start",
+          "other_at": "end"
+        }
+      ]
+    },
+    {
+      "id": "E4005",
+      "point_ids": [
+        "P061",
+        "P062",
+        "P063",
+        "P064",
+        "P065",
+        "P066",
+        "P067",
+        "P068",
+        "P069",
+        "P070",
+        "P071",
+        "P072",
+        "P073",
+        "P074",
+        "P075",
+        "P076",
+        "P077",
+        "P078",
+        "P079",
+        "P080",
+        "P081",
+        "P082",
+        "P083",
+        "P084",
+        "P085",
+        "P086",
+        "P087",
+        "P088",
+        "P089",
+        "P090"
+      ],
+      "start_point_id": "P061",
+      "end_point_id": "P090",
+      "type": "polyline",
+      "curve_hint": {
+        "kind": "nurbs_discrete",
+        "degree": 3,
+        "sample_count": 30
+      },
+      "connected_edges": [
+        {
+          "edge_id": "E4006",
+          "via_point_id": "P061",
+          "self_at": "start",
+          "other_at": "end"
+        },
+        {
+          "edge_id": "E4006",
+          "via_point_id": "P090",
+          "self_at": "end",
+          "other_at": "start"
+        },
+        {
+          "edge_id": "E4009",
+          "via_point_id": "P061",
+          "self_at": "start",
+          "other_at": "end"
+        },
+        {
+          "edge_id": "E4010",
+          "via_point_id": "P061",
+          "self_at": "start",
+          "other_at": "start"
+        }
+      ]
+    },
+    {
+      "id": "E4006",
+      "point_ids": [
+        "P090",
+        "P089",
+        "P088",
+        "P087",
+        "P086",
+        "P085",
+        "P084",
+        "P083",
+        "P082",
+        "P081",
+        "P080",
+        "P079",
+        "P078",
+        "P077",
+        "P076",
+        "P075",
+        "P074",
+        "P073",
+        "P072",
+        "P071",
+        "P070",
+        "P069",
+        "P068",
+        "P067",
+        "P066",
+        "P065",
+        "P064",
+        "P063",
+        "P062",
+        "P061"
+      ],
+      "start_point_id": "P090",
+      "end_point_id": "P061",
+      "type": "polyline",
+      "curve_hint": {
+        "kind": "nurbs_discrete",
+        "degree": 3,
+        "sample_count": 30
+      },
+      "connected_edges": [
+        {
+          "edge_id": "E4005",
+          "via_point_id": "P090",
+          "self_at": "start",
+          "other_at": "end"
+        },
+        {
+          "edge_id": "E4005",
+          "via_point_id": "P061",
+          "self_at": "end",
+          "other_at": "start"
+        },
+        {
+          "edge_id": "E4009",
+          "via_point_id": "P061",
+          "self_at": "end",
+          "other_at": "end"
+        },
+        {
+          "edge_id": "E4010",
+          "via_point_id": "P061",
+          "self_at": "end",
+          "other_at": "start"
+        }
+      ]
+    },
+    {
+      "id": "E4007",
+      "point_ids": [
+        "P030",
+        "P091",
+        "P092",
+        "P031"
+      ],
+      "start_point_id": "P030",
+      "end_point_id": "P031",
+      "type": "polyline",
+      "connected_edges": [
+        {
+          "edge_id": "E4008",
+          "via_point_id": "P030",
+          "self_at": "start",
+          "other_at": "end"
+        },
+        {
+          "edge_id": "E4008",
+          "via_point_id": "P031",
+          "self_at": "end",
+          "other_at": "start"
+        },
+        {
+          "edge_id": "E4001",
+          "via_point_id": "P030",
+          "self_at": "start",
+          "other_at": "end"
+        },
+        {
+          "edge_id": "E4002",
+          "via_point_id": "P030",
+          "self_at": "start",
+          "other_at": "start"
+        },
+        {
+          "edge_id": "E4003",
+          "via_point_id": "P031",
+          "self_at": "end",
+          "other_at": "start"
+        },
+        {
+          "edge_id": "E4004",
+          "via_point_id": "P031",
+          "self_at": "end",
+          "other_at": "end"
+        }
+      ]
+    },
+    {
+      "id": "E4008",
+      "point_ids": [
+        "P031",
+        "P092",
+        "P091",
+        "P030"
+      ],
+      "start_point_id": "P031",
+      "end_point_id": "P030",
+      "type": "polyline",
+      "connected_edges": [
+        {
+          "edge_id": "E4007",
+          "via_point_id": "P031",
+          "self_at": "start",
+          "other_at": "end"
+        },
+        {
+          "edge_id": "E4007",
+          "via_point_id": "P030",
+          "self_at": "end",
+          "other_at": "start"
+        },
+        {
+          "edge_id": "E4001",
+          "via_point_id": "P030",
+          "self_at": "end",
+          "other_at": "end"
+        },
+        {
+          "edge_id": "E4002",
+          "via_point_id": "P030",
+          "self_at": "end",
+          "other_at": "start"
+        },
+        {
+          "edge_id": "E4003",
+          "via_point_id": "P031",
+          "self_at": "start",
+          "other_at": "start"
+        },
+        {
+          "edge_id": "E4004",
+          "via_point_id": "P031",
+          "self_at": "start",
+          "other_at": "end"
+        }
+      ]
+    },
+    {
+      "id": "E4009",
+      "point_ids": [
+        "P060",
+        "P093",
+        "P094",
+        "P095",
+        "P061"
+      ],
+      "start_point_id": "P060",
+      "end_point_id": "P061",
+      "type": "polyline",
+      "connected_edges": [
+        {
+          "edge_id": "E4010",
+          "via_point_id": "P060",
+          "self_at": "start",
+          "other_at": "end"
+        },
+        {
+          "edge_id": "E4010",
+          "via_point_id": "P061",
+          "self_at": "end",
+          "other_at": "start"
+        },
+        {
+          "edge_id": "E4003",
+          "via_point_id": "P060",
+          "self_at": "start",
+          "other_at": "end"
+        },
+        {
+          "edge_id": "E4004",
+          "via_point_id": "P060",
+          "self_at": "start",
+          "other_at": "start"
+        },
+        {
+          "edge_id": "E4005",
+          "via_point_id": "P061",
+          "self_at": "end",
+          "other_at": "start"
+        },
+        {
+          "edge_id": "E4006",
+          "via_point_id": "P061",
+          "self_at": "end",
+          "other_at": "end"
+        }
+      ]
+    },
+    {
+      "id": "E4010",
+      "point_ids": [
+        "P061",
+        "P095",
+        "P094",
+        "P093",
+        "P060"
+      ],
+      "start_point_id": "P061",
+      "end_point_id": "P060",
+      "type": "polyline",
+      "connected_edges": [
+        {
+          "edge_id": "E4009",
+          "via_point_id": "P061",
+          "self_at": "start",
+          "other_at": "end"
+        },
+        {
+          "edge_id": "E4009",
+          "via_point_id": "P060",
+          "self_at": "end",
+          "other_at": "start"
+        },
+        {
+          "edge_id": "E4003",
+          "via_point_id": "P060",
+          "self_at": "end",
+          "other_at": "end"
+        },
+        {
+          "edge_id": "E4004",
+          "via_point_id": "P060",
+          "self_at": "end",
+          "other_at": "start"
+        },
+        {
+          "edge_id": "E4005",
+          "via_point_id": "P061",
+          "self_at": "start",
+          "other_at": "start"
+        },
+        {
+          "edge_id": "E4006",
+          "via_point_id": "P061",
+          "self_at": "start",
+          "other_at": "end"
+        }
+      ]
+    }
+  ]
+}

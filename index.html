@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>边数据渲染器 (V1)</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body>
+  <main class="app">
+    <header class="toolbar">
+      <div class="controls">
+        <label class="file-label" for="fileInput">选择 JSON 文件</label>
+        <input id="fileInput" type="file" accept=".json,application/json" />
+        <button id="loadSampleBtn" type="button">加载示例</button>
+        <button id="resetViewBtn" type="button" disabled>重置视角</button>
+        <button id="toggleLabelsBtn" type="button">隐藏标签</button>
+      </div>
+      <div class="status-wrap">
+        <p id="status" class="status info">等待加载数据</p>
+        <p id="stats" class="stats">点: 0 | 边: 0</p>
+      </div>
+    </header>
+
+    <section class="viewer-wrap">
+      <canvas id="viewerCanvas" aria-label="3D edge viewer"></canvas>
+    </section>
+
+    <footer class="tips">
+      鼠标左键拖动旋转，滚轮缩放。边的箭头方向为 point_ids 从前到后。
+    </footer>
+  </main>
+
+  <!-- 加载顺序：常量 → 解析 → 渲染 → 主逻辑 -->
+  <script src="./constants.js"></script>
+  <script src="./parser.js"></script>
+  <script src="./viewer.js"></script>
+  <script src="./main.js"></script>
+</body>
+
+</html>
