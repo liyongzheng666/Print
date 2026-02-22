@@ -27,12 +27,17 @@ function hashColor(id, index) {
 function computeBounds(points) {
     let minX = Infinity, minY = Infinity, minZ = Infinity;
     let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
+    let minU = Infinity, minV = Infinity;
+    let maxU = -Infinity, maxV = -Infinity;
 
     for (const p of points) {
         minX = Math.min(minX, p.x); minY = Math.min(minY, p.y); minZ = Math.min(minZ, p.z);
         maxX = Math.max(maxX, p.x); maxY = Math.max(maxY, p.y); maxZ = Math.max(maxZ, p.z);
+        minU = Math.min(minU, p.u); minV = Math.min(minV, p.v);
+        maxU = Math.max(maxU, p.u); maxV = Math.max(maxV, p.v);
     }
 
+    // 3D Bounds
     const center = {
         x: (minX + maxX) * 0.5,
         y: (minY + maxY) * 0.5,
@@ -40,7 +45,16 @@ function computeBounds(points) {
     };
     const dx = maxX - minX, dy = maxY - minY, dz = maxZ - minZ;
     const radius = Math.max(Math.hypot(dx, dy, dz) * 0.5, 1e-6);
-    return { center, radius };
+
+    // 2D Bounds
+    const center2D = {
+        u: (minU + maxU) * 0.5,
+        v: (minV + maxV) * 0.5
+    };
+    const du = maxU - minU, dv = maxV - minV;
+    const radius2D = Math.max(Math.hypot(du, dv) * 0.5, 1e-6);
+
+    return { center, radius, center2D, radius2D };
 }
 
 /* ── 重叠检测：正向/反向点序列视为同一条 ─────────────────────── */
@@ -133,7 +147,9 @@ function parseModel(data) {
             id: point.id,
             x: numberOrThrow(point.x, `points[${idx}].x`),
             y: numberOrThrow(point.y, `points[${idx}].y`),
-            z: numberOrThrow(point.z, `points[${idx}].z`)
+            z: numberOrThrow(point.z, `points[${idx}].z`),
+            u: point.u !== undefined ? point.u : point.x,
+            v: point.v !== undefined ? point.v : point.y
         };
         pointMap.set(p.id, p);
         return p;

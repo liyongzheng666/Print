@@ -14,8 +14,9 @@
       <div class="controls">
         <label class="file-label" for="fileInput">选择 JSON 文件</label>
         <input id="fileInput" type="file" accept=".json,application/json" />
-        <button id="loadSampleBtn" type="button">加载示例</button>
         <button id="resetViewBtn" type="button" disabled>重置视角</button>
+        <input id="searchInput" type="text" placeholder="搜索标签..."
+          style="margin-left: 12px; padding: 4px 8px; border: 1px solid #dbe3ee; border-radius: 4px; font-size: 13px;" />
         <button id="toggleLabelsBtn" type="button">隐藏标签</button>
       </div>
       <div class="status-wrap">
@@ -24,12 +25,23 @@
       </div>
     </header>
 
-    <section class="viewer-wrap">
-      <canvas id="viewerCanvas" aria-label="3D edge viewer"></canvas>
+    <section class="viewer-container">
+      <div class="viewer-pane">
+        <h3 class="viewer-title">2D 参数空间 (U, V)</h3>
+        <div class="viewer-wrap">
+          <canvas id="viewerCanvas2D" aria-label="2D parameter space viewer"></canvas>
+        </div>
+      </div>
+      <div class="viewer-pane">
+        <h3 class="viewer-title">3D 曲面 (X, Y, Z)</h3>
+        <div class="viewer-wrap">
+          <canvas id="viewerCanvas3D" aria-label="3D edge viewer"></canvas>
+        </div>
+      </div>
     </section>
 
     <footer class="tips">
-      鼠标左键拖动旋转，滚轮缩放。边的箭头方向为 point_ids 从前到后。
+      左键拖动以平移 (2D) 或旋转 (3D)，滚轮缩放。点击边界线以在双视图间同步高亮。
     </footer>
   </main>
 

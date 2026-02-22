@@ -8,9 +8,11 @@ const fileInput = document.getElementById("fileInput");
 const loadSampleBtn = document.getElementById("loadSampleBtn");
 const resetViewBtn = document.getElementById("resetViewBtn");
 const toggleLabelsBtn = document.getElementById("toggleLabelsBtn");
+const searchInput = document.getElementById("searchInput");
 const statusEl = document.getElementById("status");
 const statsEl = document.getElementById("stats");
-const canvas = document.getElementById("viewerCanvas");
+const canvas2D = document.getElementById("viewerCanvas2D");
+const canvas3D = document.getElementById("viewerCanvas3D");
 
 /* ── 状态栏更新 ─────────────────────────────────────────────────── */
 
@@ -25,21 +27,32 @@ function setStats(pointCount, edgeCount) {
 
 /* ── Viewer 实例 ─────────────────────────────────────────────────── */
 
-const viewer = new EdgeViewer(canvas);
-const AUTO_LOAD_FILES = ["edge-data.json", "edge-sample.json"];
+const viewer2D = new EdgeViewer(canvas2D, "2D");
+const viewer3D = new EdgeViewer(canvas3D, "3D");
+
+// Synchronize edge selection
+viewer2D.onSelectEdge = (edgeId) => {
+    viewer3D.setSelectedEdge(edgeId);
+};
+viewer3D.onSelectEdge = (edgeId) => {
+    viewer2D.setSelectedEdge(edgeId);
+};
+
+const AUTO_LOAD_FILES = ["edge-2d3d-sample.json", "edge-sample.json", "edge-data.json"];
 
 /* ── 标签按钮同步 ────────────────────────────────────────────────── */
 
 function updateLabelToggleButton() {
     if (!toggleLabelsBtn) return;
-    toggleLabelsBtn.textContent = viewer.showLabels ? "隐藏标签" : "显示标签";
+    toggleLabelsBtn.textContent = viewer3D.showLabels ? "隐藏标签" : "显示标签";
 }
 
 /* ── 数据加载（解析 + 渲染 + 状态更新）────────────────────────── */
 
 function loadDataObject(rawData, sourceLabel) {
     const model = parseModel(rawData);
-    viewer.setModel(model);
+    viewer2D.setModel(model);
+    viewer3D.setModel(model);
     setStats(model.points.length, model.edges.length);
 
     const overlapCount = model.edges.filter((e) => e.overlapCount > 1).length;
@@ -65,22 +78,56 @@ fileInput.addEventListener("change", async (event) => {
 });
 
 // 内置示例
-loadSampleBtn.addEventListener("click", () => {
-    try {
-        loadDataObject(SAMPLE_DATA, "内置示例");
-    } catch (error) {
-        setStatus(`示例加载失败: ${error.message}`, "err");
-    }
-});
+if (loadSampleBtn) {
+    loadSampleBtn.addEventListener("click", () => {
+        try {
+            loadDataObject(SAMPLE_DATA, "内置示例");
+        } catch (error) {
+            setStatus(`示例加载失败: ${error.message}`, "err");
+        }
+    });
+}
 
 // 重置视角
-resetViewBtn.addEventListener("click", () => viewer.resetView());
+resetViewBtn.addEventListener("click", () => {
+    viewer2D.resetView();
+    viewer3D.resetView();
+});
 
 // 切换标签
 if (toggleLabelsBtn) {
     toggleLabelsBtn.addEventListener("click", () => {
-        viewer.toggleLabelVisibility();
+        viewer2D.toggleLabelVisibility();
+        viewer3D.toggleLabelVisibility();
         updateLabelToggleButton();
+    });
+}
+
+// 标签搜索
+if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+        const query = e.target.value.trim().toLowerCase();
+
+        // 如果没有输入或者没有模型，清空高亮
+        if (!query || !viewer2D.model || !viewer3D.model) {
+            viewer2D.setSelectedEdge(null);
+            viewer3D.setSelectedEdge(null);
+            return;
+        }
+
+        // 查找第一个匹配的标签
+        const match = viewer2D.model.edges.find(edge =>
+            edge.label && edge.label.toLowerCase().includes(query)
+        );
+
+        if (match) {
+            viewer2D.setSelectedEdge(match.id);
+            viewer3D.setSelectedEdge(match.id);
+        } else {
+            // 如果没找到，可以选择清空高亮或者保持不变
+            viewer2D.setSelectedEdge(null);
+            viewer3D.setSelectedEdge(null);
+        }
     });
 }
 
@@ -94,9 +141,9 @@ async function tryAutoLoad() {
             const response = await fetch(`./${fileName}`, { cache: "no-store" });
             if (!response.ok) continue;
             loadDataObject(await response.json(), fileName);
-            return;
-        } catch (_err) {
-            // file:// 协议下 fetch 可能因安全限制失败，忽略即可
+            break;
+        } catch (e) {
+            console.log(`[AutoLoad] 无法获取 ${fileName}`);
         }
     }
 }

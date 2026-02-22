@@ -3,25 +3,49 @@
 "use strict";
 
 class EdgeViewer {
-    constructor(canvasElement) {
+    constructor(canvasElement, mode = "3D") {
         this.canvas = canvasElement;
         this.ctx = this.canvas.getContext("2d");
         this.model = null;
+        this.mode = mode; // "2D" or "3D"
 
         this.width = 0;
         this.height = 0;
 
         this.dragging = false;
+        this.isMouseDown = false;
+        this.startX = 0;
+        this.startY = 0;
         this.lastX = 0;
         this.lastY = 0;
 
+        // 3D camera properties
         this.defaultYaw = -0.7;
         this.defaultPitch = 0.5;
         this.defaultZoom = 1.0;
         this.yaw = this.defaultYaw;
         this.pitch = this.defaultPitch;
         this.zoom = this.defaultZoom;
+
+        // 2D camera properties
+        this.panX = 0;
+        this.panY = 0;
+
+        // Label dragging state
+        this.labelOffsets = {}; // { edgeId: {x, y} }
+        this.draggedLabelEdgeId = null;
+        this.labelDragStartX = 0;
+        this.labelDragStartY = 0;
+        this.labelDragStartOffsetX = 0;
+        this.labelDragStartOffsetY = 0;
+
         this.showLabels = true;
+        this.selectedEdgeId = null;
+        this.onSelectEdge = null; // Callback for when an edge is clicked
+
+        // Interaction boxes
+        this.labelBoxes = []; // { id, x, y, w, h }
+        this.legendBoxes = []; // { id, x, y, w, h }
 
         this.bindEvents();
         this.resize();
@@ -33,23 +57,122 @@ class EdgeViewer {
         window.addEventListener("resize", () => this.resize());
 
         this.canvas.addEventListener("mousedown", (e) => {
-            this.dragging = true;
+            const rect = this.canvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+
+            // Check if clicking a label to drag
+            if (this.showLabels) {
+                // We reverse loop to check top-most labels first
+                for (let i = this.labelBoxes.length - 1; i >= 0; i--) {
+                    const box = this.labelBoxes[i];
+                    if (clickX >= box.x && clickX <= box.x + box.w &&
+                        clickY >= box.y && clickY <= box.y + box.h) {
+
+                        this.draggedLabelEdgeId = box.id;
+                        this.labelDragStartX = clickX;
+                        this.labelDragStartY = clickY;
+
+                        const curOffset = this.labelOffsets[box.id] || { x: 0, y: 0 };
+                        this.labelDragStartOffsetX = curOffset.x;
+                        this.labelDragStartOffsetY = curOffset.y;
+                        return; // Prevent triggering canvas drag
+                    }
+                }
+            }
+
+            this.isMouseDown = true;
+            this.dragging = false; // reset flag
             this.lastX = e.clientX;
             this.lastY = e.clientY;
+            this.startX = e.clientX;
+            this.startY = e.clientY;
         });
 
-        window.addEventListener("mouseup", () => { this.dragging = false; });
+        window.addEventListener("mouseup", () => {
+            this.isMouseDown = false;
+            if (this.draggedLabelEdgeId !== null) {
+                this.draggedLabelEdgeId = null;
+            }
+            // We do NOT reset this.dragging here, so the click handler can check it
+        });
 
         window.addEventListener("mousemove", (e) => {
-            if (!this.dragging) return;
+            if (this.draggedLabelEdgeId !== null) {
+                const rect = this.canvas.getBoundingClientRect();
+                const curX = e.clientX - rect.left;
+                const curY = e.clientY - rect.top;
+
+                const dx = curX - this.labelDragStartX;
+                const dy = curY - this.labelDragStartY;
+
+                this.labelOffsets[this.draggedLabelEdgeId] = {
+                    x: this.labelDragStartOffsetX + dx,
+                    y: this.labelDragStartOffsetY + dy
+                };
+
+                this.render();
+                return;
+            }
+
+            if (!this.isMouseDown) return;
+
             const dx = e.clientX - this.lastX;
             const dy = e.clientY - this.lastY;
+
+            // If mouse moved more than 3 pixels, consider it a drag
+            if (Math.hypot(e.clientX - this.startX, e.clientY - this.startY) > 3) {
+                this.dragging = true;
+            }
+
             this.lastX = e.clientX;
             this.lastY = e.clientY;
-            this.yaw += dx * 0.01;
-            this.pitch += dy * 0.01;
-            this.pitch = Math.max(-1.5, Math.min(1.5, this.pitch));
+
+            if (this.mode === "3D") {
+                this.yaw += dx * 0.01;
+                this.pitch += dy * 0.01;
+                this.pitch = Math.max(-1.5, Math.min(1.5, this.pitch));
+            } else {
+                this.panX += dx;
+                this.panY += dy;
+            }
             this.render();
+        });
+
+        this.canvas.addEventListener("click", (e) => {
+            if (!this.model) return;
+            // Prevent click if we were dragging (e.g. pan/rotate or label drag)
+            if (this.dragging) {
+                this.dragging = false; // Reset for next time
+                return;
+            }
+
+            const rect = this.canvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+
+            // Check legend clicks first
+            if (this.showLabels) {
+                for (const box of this.legendBoxes) {
+                    if (clickX >= box.x && clickX <= box.x + box.w &&
+                        clickY >= box.y && clickY <= box.y + box.h) {
+
+                        if (this.selectedEdgeId !== box.id) {
+                            this.setSelectedEdge(box.id);
+                            if (this.onSelectEdge) this.onSelectEdge(box.id);
+                        } else {
+                            this.setSelectedEdge(null);
+                            if (this.onSelectEdge) this.onSelectEdge(null);
+                        }
+                        return; // Found a legend click, stop processing
+                    }
+                }
+            }
+
+            // Fallback to edge hit test requires DPR scaled values 
+            // because drawPoints in handleHitTest are previously manually scaled by DPR to match native line geometry
+            const dpr = window.devicePixelRatio || 1;
+            this.handleHitTest({ x: clickX * dpr, y: clickY * dpr });
         });
 
         this.canvas.addEventListener("wheel", (e) => {
@@ -84,7 +207,64 @@ class EdgeViewer {
         this.yaw = this.defaultYaw;
         this.pitch = this.defaultPitch;
         this.zoom = this.defaultZoom;
+        this.panX = 0;
+        this.panY = 0;
         this.render();
+    }
+
+    setSelectedEdge(edgeId) {
+        this.selectedEdgeId = edgeId;
+        this.render();
+    }
+
+    handleHitTest(clickPoint) {
+        let bestEdge = null;
+        let minDist = 25 * (window.devicePixelRatio || 1); // Hit tolerance (pixels) accounting for DPR
+
+        const dpr = window.devicePixelRatio || 1;
+        const projected = this.model.edges.map(edge => {
+            let positions3D = edge.positions;
+            if (this.mode === "3D") {
+                positions3D = this.offset3DPositions(edge.positions, edge.overlapOrder, edge.overlapCount);
+            }
+            const drawPoints = positions3D.map(p => {
+                const proj = this.project(p);
+                return { x: proj.x * dpr, y: proj.y * dpr };
+            });
+            return { edge, drawPoints };
+        });
+
+        for (const { edge, drawPoints } of projected) {
+            for (let i = 0; i < drawPoints.length - 1; i++) {
+                const p1 = drawPoints[i];
+                const p2 = drawPoints[i + 1];
+                const dist = this.pointToSegmentDistance(clickPoint, p1, p2);
+                if (dist < minDist) {
+                    minDist = dist;
+                    bestEdge = edge;
+                }
+            }
+        }
+
+        // console.log(`[HitTest ${this.mode}] clicked mapped to`, clickPoint, `closest dist:`, minDist, bestEdge ? `Found edge: ${bestEdge.id}` : `No edge found`);
+
+        if (bestEdge && bestEdge.id !== this.selectedEdgeId) {
+            this.selectedEdgeId = bestEdge.id;
+            if (this.onSelectEdge) this.onSelectEdge(bestEdge.id);
+            this.render();
+        } else if (!bestEdge && this.selectedEdgeId !== null) {
+            this.selectedEdgeId = null;
+            if (this.onSelectEdge) this.onSelectEdge(null);
+            this.render();
+        }
+    }
+
+    pointToSegmentDistance(p, v, w) {
+        const l2 = (w.x - v.x) ** 2 + (w.y - v.y) ** 2;
+        if (l2 === 0) return Math.hypot(p.x - v.x, p.y - v.y);
+        let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+        t = Math.max(0, Math.min(1, t));
+        return Math.hypot(p.x - (v.x + t * (w.x - v.x)), p.y - (v.y + t * (w.y - v.y)));
     }
 
     setLabelVisibility(visible) {
@@ -99,26 +279,43 @@ class EdgeViewer {
     /* ── 3D → 2D 透视投影 ─────────────────────────────────────── */
 
     project(point) {
-        const { center, radius } = this.model.bounds;
-        const scale = radius > 0 ? radius : 1;
-        const x = (point.x - center.x) / scale;
-        const y = (point.y - center.y) / scale;
-        const z = (point.z - center.z) / scale;
+        if (this.mode === "3D") {
+            const { center, radius } = this.model.bounds;
+            const scale = radius > 0 ? radius : 1;
+            const x = (point.x - center.x) / scale;
+            const y = (point.y - center.y) / scale;
+            const z = (point.z - center.z) / scale;
 
-        const cosY = Math.cos(this.yaw), sinY = Math.sin(this.yaw);
-        const x1 = cosY * x + sinY * z;
-        const z1 = -sinY * x + cosY * z;
+            const cosY = Math.cos(this.yaw), sinY = Math.sin(this.yaw);
+            const x1 = cosY * x + sinY * z;
+            const z1 = -sinY * x + cosY * z;
 
-        const cosX = Math.cos(this.pitch), sinX = Math.sin(this.pitch);
-        const y1 = cosX * y - sinX * z1;
-        const z2 = sinX * y + cosX * z1;
+            const cosX = Math.cos(this.pitch), sinX = Math.sin(this.pitch);
+            const y1 = cosX * y - sinX * z1;
+            const z2 = sinX * y + cosX * z1;
 
-        const perspective = (this.height * 0.42 * this.zoom) / (2.8 + z2);
-        return {
-            x: this.width * 0.5 + x1 * perspective,
-            y: this.height * 0.5 - y1 * perspective,
-            z: z2
-        };
+            const perspective = (this.height * 0.42 * this.zoom) / (2.8 + z2);
+            return {
+                x: this.width * 0.5 + x1 * perspective,
+                y: this.height * 0.5 - y1 * perspective,
+                z: z2
+            };
+        } else {
+            // 2D Orthographic Mode
+            const { center2D, radius2D } = this.model.bounds;
+            const scale = radius2D > 0 ? radius2D : 1;
+            const u = (point.u - center2D.u) / scale;
+            const v = (point.v - center2D.v) / scale;
+
+            // Simple scaling to fit canvas height with zoom
+            const canvasScale = (this.height * 0.42) * this.zoom;
+
+            return {
+                x: this.width * 0.5 + (u * canvasScale) + this.panX,
+                y: this.height * 0.5 - (v * canvasScale) + this.panY,
+                z: 0 // No depth in 2D
+            };
+        }
     }
 
     /* ══════════════ 主渲染循环 ══════════════════════════════════ */
@@ -141,6 +338,9 @@ class EdgeViewer {
             return;
         }
 
+        this.labelBoxes = [];
+        this.legendBoxes = [];
+
         // 投影并按深度排序（画家算法）
         const projected = this.model.edges
             .map((edge) => {
@@ -153,14 +353,30 @@ class EdgeViewer {
         for (const { edge, points } of projected) {
             if (points.length < 2) continue;
 
-            // ── 3D 模型空间偏移后投影（消除旋转时的扭曲缺陷）──
-            const positions3D = this.offset3DPositions(
-                edge.positions, edge.overlapOrder, edge.overlapCount
-            );
+            let positions3D = edge.positions;
+            if (this.mode === "3D") {
+                positions3D = this.offset3DPositions(edge.positions, edge.overlapOrder, edge.overlapCount);
+            }
             const drawPoints = positions3D.map((p) => this.project(p));
 
             // 描边（含虚线样式）
             ctx.save();
+            const isSelected = (this.selectedEdgeId === edge.id);
+
+            // Draw highlight background first
+            if (isSelected) {
+                ctx.setLineDash([]);
+                ctx.lineWidth = 4.5; // Thicker background for highlight
+                ctx.strokeStyle = "#ffeb3b"; // Bright yellow for selection
+                ctx.beginPath();
+                ctx.moveTo(drawPoints[0].x, drawPoints[0].y);
+                for (let i = 1; i < drawPoints.length; i += 1) {
+                    ctx.lineTo(drawPoints[i].x, drawPoints[i].y);
+                }
+                ctx.stroke();
+            }
+
+            // Draw regular dashed/solid line on top
             ctx.setLineDash(
                 edge.overlapCount > 1
                     ? DASH_PATTERNS[edge.overlapOrder % DASH_PATTERNS.length]
@@ -171,8 +387,8 @@ class EdgeViewer {
             for (let i = 1; i < drawPoints.length; i += 1) {
                 ctx.lineTo(drawPoints[i].x, drawPoints[i].y);
             }
-            ctx.strokeStyle = edge.color;
-            ctx.lineWidth = 1.5; // 统一细线，重叠时更易区分
+            ctx.strokeStyle = isSelected ? "#000000" : edge.color;
+            ctx.lineWidth = isSelected ? 2.5 : 1.5;
             ctx.stroke();
             ctx.restore();
 
@@ -272,13 +488,20 @@ class EdgeViewer {
         const boxW = Math.ceil(metrics.width) + 16;
         const boxH = 20;
 
-        // 夹紧到画布内，防止标签跑出边界
-        const lx = Math.round(Math.max(boxW * 0.5 + 4, Math.min(this.width - boxW * 0.5 - 4, mid.x)));
-        const ly = Math.round(Math.max(boxH * 0.5 + 4, Math.min(this.height - boxH * 0.5 - 4, mid.y - 16)));
+        // 夹紧到画布内，防止标签跑出边界（考虑用户自定义偏移）
+        const offset = this.labelOffsets[edge.id] || { x: 0, y: 0 };
+        const targetX = mid.x + offset.x;
+        const targetY = mid.y - 16 + offset.y;
+
+        const lx = Math.round(Math.max(boxW * 0.5 + 4, Math.min(this.width - boxW * 0.5 - 4, targetX)));
+        const ly = Math.round(Math.max(boxH * 0.5 + 4, Math.min(this.height - boxH * 0.5 - 4, targetY)));
         const bx = lx - boxW * 0.5;
         const by = ly - boxH * 0.5;
 
-        // 连接线（中点 → 标签框底）
+        // Save layout box for hit testing
+        this.labelBoxes.push({ id: edge.id, x: bx, y: by, w: boxW, h: boxH });
+
+        // 连接线（中点 → 标签框参考点，考虑到拖拽偏移，可能连接到四边）
         ctx.beginPath();
         ctx.moveTo(mid.x, mid.y);
         ctx.lineTo(lx, ly + boxH * 0.5);
@@ -373,6 +596,25 @@ class EdgeViewer {
             const e = edges[i];
             const ey = py + padY + i * lineH + lineH * 0.5;
             const sx = px + padX;
+
+            const isLegendSelected = (e.id === this.selectedEdgeId);
+            const panelW = maxW + padX * 2 + 40;
+            const lineRect = {
+                x: px,
+                y: ey - lineH * 0.5,
+                w: panelW,
+                h: lineH
+            };
+            this.legendBoxes.push({ id: e.id, ...lineRect });
+
+            // Highlight bar behind item if selected
+            if (isLegendSelected) {
+                ctx.save();
+                ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+                this.roundRectPath(lineRect.x, lineRect.y, lineRect.w, lineRect.h, 4);
+                ctx.fill();
+                ctx.restore();
+            }
 
             // 颜色样本线（复制对应虚线样式）
             ctx.save();
