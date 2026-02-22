@@ -101,17 +101,45 @@ button:disabled {
   color: var(--warn);
 }
 
+.viewer-container {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  min-height: 480px;
+}
+
+.viewer-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 300px;
+}
+
+.viewer-title {
+  margin: 0;
+  font-size: 15px;
+  color: #334155;
+  text-align: center;
+  font-weight: 600;
+}
+
 .viewer-wrap {
-  min-height: 320px;
+  flex: 1;
   border: 1px solid #dbe3ee;
   border-radius: 12px;
   overflow: hidden;
   background: linear-gradient(180deg, #fefeff 0%, #f6f9ff 100%);
+  position: relative;
 }
 
-#viewerCanvas {
+#viewerCanvas2D,
+#viewerCanvas3D {
   width: 100%;
   height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
   display: block;
 }
 
