@@ -2,7 +2,7 @@
 
 Print 是面向 FreeCAD / OpenCASCADE 几何算法调试的独立 Viewer。它同时服务于 Agent 自动调试和人类开发者分析，以原始模型为基准，增量显示算法内部产生的点、曲线、面和 Shape。
 
-当前分支处于 M0 基础阶段：建立新协议、Scene Store、Renderer Registry 和中文工程界面。旧版 Canvas 点/边查看器仍保留在仓库根目录，迁移期间不会被直接删除。
+当前版本处于 M0 基础阶段：建立新协议、Scene Store、Renderer Registry 和中文工程界面。旧版 Canvas 点/边查看器仍保留在仓库根目录，迁移期间不会被直接删除。
 
 ## 已确认的产品边界
 
@@ -157,4 +157,4 @@ python3 -m http.server 5778
 3. M2：BREP/mesh、FCStd baseline 和世界坐标对齐。
 4. M3：Stripe、SurfData、CommonPoint 和圆角失败可视化。
 
-完整系统架构见 [freecad-occt-debug-kit 架构文档](https://github.com/liyongzheng666/freecad-occt-debug-kit/blob/codex/occ-debug-agent-architecture/docs/occ-fillet-debug-agent-architecture.md)。M0 初始化时核对的依赖版本见 [docs/product-facts.md](docs/product-facts.md)。
+完整系统架构见 [freecad-occt-debug-kit 主分支架构文档](https://github.com/liyongzheng666/freecad-occt-debug-kit/blob/main/docs/occ-fillet-debug-agent-architecture.md)。M0 初始化时核对的依赖版本见 [docs/product-facts.md](docs/product-facts.md)。
