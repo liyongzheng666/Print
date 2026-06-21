@@ -8,8 +8,10 @@ interface SceneActions {
   readonly selectEntity: (id: string | null) => void;
   readonly setGroupVisibility: (group: string, visible: boolean) => void;
   readonly soloGroup: (group: string) => void;
+  readonly showAllGroups: () => void;
   readonly clearGroup: (group: string) => void;
   readonly clearLocalDebugScene: () => void;
+  readonly noteDiagnostic: (message: string, seq?: number) => void;
   readonly reset: () => void;
 }
 
@@ -42,6 +44,9 @@ export const useSceneStore = create<SceneStore>((set) => ({
         ),
       };
     }),
+  // Exit Solo / un-hide everything: clearing groupVisibility makes every
+  // group visible again (isGroupVisible defaults to true with no entry).
+  showAllGroups: () => set({ groupVisibility: {} }),
   clearGroup: (group) =>
     set((state) => ({
       entities: Object.fromEntries(
@@ -62,5 +67,7 @@ export const useSceneStore = create<SceneStore>((set) => ({
       highlightedIds: [],
       selectedId: null,
     })),
+  noteDiagnostic: (message, seq = 0) =>
+    set((state) => ({ diagnostics: [...state.diagnostics, { level: "warning", message, seq }] })),
   reset: () => set(initialStoreState),
 }));

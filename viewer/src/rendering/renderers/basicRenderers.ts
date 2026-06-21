@@ -139,6 +139,18 @@ const bboxRenderer: EntityRenderer = {
   },
 };
 
+/** Geometry kinds the basic registry can render today (boundary-review D2). */
+export const SUPPORTED_KINDS: ReadonlySet<string> = new Set([
+  "point",
+  "point_set",
+  "vector",
+  "polyline",
+  "curve",
+  "edge",
+  "wire",
+  "bbox",
+]);
+
 export function createBasicRendererRegistry(): RendererRegistry {
   const registry = new RendererRegistry();
   registry.register("point", pointRenderer);

@@ -9,6 +9,7 @@ export function LayerTree() {
   const selectEntity = useSceneStore((state) => state.selectEntity);
   const setGroupVisibility = useSceneStore((state) => state.setGroupVisibility);
   const soloGroup = useSceneStore((state) => state.soloGroup);
+  const showAllGroups = useSceneStore((state) => state.showAllGroups);
   const clearGroup = useSceneStore((state) => state.clearGroup);
 
   const groups = useMemo(() => {
@@ -25,6 +26,7 @@ export function LayerTree() {
     <aside className="panel layer-panel" aria-label="模型和调试分组">
       <header className="panel-heading">
         <span>对象与分组</span>
+        <button className="text-action" type="button" onClick={showAllGroups}>显示全部</button>
         <span className="panel-count">{Object.keys(entities).length}</span>
       </header>
       <div className="layer-list">

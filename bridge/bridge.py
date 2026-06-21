@@ -30,7 +30,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
-HEARTBEAT_SECONDS = 15.0
+# Heartbeat doubles as dead-client detection: an idle, disconnected client is
+# noticed when the next keep-alive write fails (boundary-review B2).
+HEARTBEAT_SECONDS = 8.0
 
 
 class SessionTailer:
@@ -50,7 +52,15 @@ class SessionTailer:
         """Yield (lineno, text) for every complete line since last drain."""
         if not self.events_path.exists():
             return
-        with self.events_path.open("r", encoding="utf-8") as handle:
+        # Truncation/rotation guard (boundary-review A1): if the file shrank
+        # below our cursor, the old offset points past EOF and we would go
+        # silent forever — restart from the top and re-replay instead.
+        if self.events_path.stat().st_size < self.offset:
+            self.offset = 0
+            self.lineno = 0
+        # errors="replace" (B1): a corrupt/non-UTF-8 byte must not raise and
+        # tear down the SSE thread; the bad line surfaces as a viewer diagnostic.
+        with self.events_path.open("r", encoding="utf-8", errors="replace") as handle:
             handle.seek(self.offset)
             while True:
                 line = handle.readline()
