@@ -1,96 +1,160 @@
-# 3D Graph Visualization (Print)
+# Print · OCCT 几何调试器
 
-## 项目简介
-本项目是一个基于 HTML5 Canvas 和 JavaScript 实现的 3D 数据图谱（点、边）可视化渲染工具。主要用于在浏览器中加载 JSON 格式的三维点与边数据，实现交互式的可视化渲染。项目具备三维空间中的连线、重叠边的对比显示、正交投影渲染、鼠标拖动旋转、滚轮缩放以及本地数据解析等功能。
+Print 是面向 FreeCAD / OpenCASCADE 几何算法调试的独立 Viewer。它同时服务于 Agent 自动调试和人类开发者分析，以原始模型为基准，增量显示算法内部产生的点、曲线、面和 Shape。
 
-### 🌟 近期新增功能 (V2.0)
-- **双视图对比渲染**：支持在一屏内同时渲染 `2D 参数空间 (U, V)`（正交视角） 和 `3D 曲面空间 (X, Y, Z)`（透视视角）的线框数据。
-- **跨视图同步高亮**：在任意一个视图中用鼠标选中某条边，另一个视图即可实时同步高亮该边。
-- **可交互式标签**：
-  - 画布上重合或者密集的边标签，可以通过鼠标**按住拖拽**进行避让偏移，数据不会受影响。
-  - 右上角的图例面板中的文字支持直接**鼠标点击选中**并高亮对应的线。
-- **快速局部搜索**：工具栏新增了标签搜索框，支持局部模糊搜索（如输入 "E00"），可以飞速在画面中高亮带有该字符串的所有匹配边段。
-- **完备的测试集生成**：内置 Python 脚本（`generate_closed_surfaces.py` 等）能够一键生成用于验证 2D 缝合点逻辑的圆台、圆柱闭合曲面测试用例。
+当前分支处于 M0 基础阶段：建立新协议、Scene Store、Renderer Registry 和中文工程界面。旧版 Canvas 点/边查看器仍保留在仓库根目录，迁移期间不会被直接删除。
 
-该项目的核心难点及解决方案是重叠线段的渲染：通过引入黄金角相差与明度交替的动态算法自动为重叠边分配高对比度色彩，并计算相应的微小 3D 偏移和错开重叠虚线线型，使得在任何视角下多条重合的连线也能清晰可辨、标签文本错落有致。
+## 已确认的产品边界
 
-该项目当前以模块化方式重构，将逻辑划分为常量配置、解析引擎、渲染视图以及主交互四大模块。并在 `app.js` 中保留了用于测试或旧版迁移的整合打包代码。
+- 3D 是主视图，UV 通过按钮按需开启。
+- 左侧显示适度简化的 FreeCAD 对象层级和调试分组。
+- 右侧显示几何、拓扑、FreeCAD element 和源码位置。
+- 支持 add/update/remove、分组显示、Solo 和清空。
+- baseline 默认受保护，新 Run 默认清理旧调试对象。
+- Viewer 运行在 localhost 浏览器，不内嵌 FreeCAD 或 VS Code。
+- MVP 不直接控制 Agent，不实现完整时间轴。
+- UI 使用中文；协议字段、类型和代码使用英文。
 
-## 运行与停止项目
+## 技术栈
 
-本项目是一个纯前端静态页面，无需复杂的 Node.js 后端支持，只需启动一个本地静态服务器即可运行。
+- TypeScript 6
+- Vite 8
+- React 19
+- Zustand 5
+- Three.js r184
+- Vitest 4
 
-### 启动项目
-在项目根目录下，使用 Python 内置的 HTTP 服务器模块启动：
+React 负责工具栏、分组树、属性检查器和 UV 面板；Three.js 由独立 `SceneController` 管理，不使用 React Three Fiber。
+
+## 新版开发入口
+
+要求 Node.js 20.19+；当前开发环境使用 Node.js 24。
+
 ```bash
-python3 -m http.server 5777
+npm install
+npm run dev
 ```
-启动成功后，打开浏览器访问 [http://localhost:5777](http://localhost:5777)。
 
-### 停止项目
-在运行上述命令的终端窗口中，按下 `Ctrl + C` 即可中止进程并停止服务器。
+浏览器访问 <http://127.0.0.1:5777>。
 
-如果出现端口占用，可以通过以下命令强制停止占用 `5777` 端口的进程：
+验证命令：
+
 ```bash
-kill -9 $(lsof -t -i:5777)
+npm run typecheck
+npm test
+npm run build
 ```
 
-### 生成测试数据
-如果您有一份 `generate_closed_surfaces.py` 脚本，可以通过以下命令运行此脚本生成自带边界缝合线的特殊圆柱或圆台 JSON 测试文件供使用：
+## 目录结构
+
+```text
+Print/
+├── protocol/
+│   ├── event.schema.json
+│   └── session.schema.json
+├── viewer/
+│   ├── index.html
+│   └── src/
+│       ├── core/
+│       │   ├── protocol/
+│       │   └── scene-store/
+│       ├── rendering/
+│       │   └── renderers/
+│       ├── features/
+│       │   ├── layers/
+│       │   ├── inspector/
+│       │   ├── uv-viewer/
+│       │   └── viewport/
+│       └── sample/
+├── TestJson/                     # 旧版测试数据，继续复用
+├── OCCTest/                      # 旧版 OCCT 导出实验
+├── index.html                    # 旧版入口
+├── viewer.js / parser.js         # 旧版实现
+└── package.json
+```
+
+## M0 已建立的边界
+
+### 增量事件
+
+`protocol/event.schema.json` 定义：
+
+- `add`
+- `update`
+- `remove`
+- `clear_group`
+- `clear_scene`
+- `set_visibility`
+- `highlight`
+- `focus`
+- `note`
+- `run_end`
+
+### Scene Store
+
+Scene Store 负责：
+
+- 按 ID 保存调试实体。
+- 检测重复 ID 和事件序号缺口。
+- 分组递归清理。
+- 保护 baseline。
+- 管理可见性、高亮、定位请求和运行摘要。
+
+纯 reducer 与 Zustand adapter 分离，便于无浏览器单元测试和后续 Bridge 回放。
+
+### Renderer Registry
+
+几何类型通过注册器接入，不在主 Viewport 中堆积条件分支：
+
+```ts
+registry.register("point", pointRenderer);
+registry.register("polyline", polylineRenderer);
+registry.register("shape", shapeRenderer);
+```
+
+当前 M0 已提供 point、point_set、vector、polyline/curve/edge/wire 和 bbox 的基础 Renderer。BREP/mesh、Face 和 surface_patch 在后续里程碑接入。
+
+## 旧版能力如何复用
+
+保留并迁移：
+
+- 2D UV 与 3D 联动思路。
+- 搜索、选中和高亮交互。
+- 标签和重合边可读性经验。
+- `TestJson` 中的曲线、周期面和闭合面数据。
+
+逐步替换：
+
+- Canvas 3D Renderer。
+- `parseModel()` 的 points/edges 单次模型。
+- `setModel()` 全量覆盖流程。
+- 重复维护的 `app.js`。
+
+旧 `cg_edge_export` 将通过兼容适配器导入，不再继续扩展为新协议。
+
+## 几何约束
+
+- BREP 是权威几何，浏览器 Mesh 只是派生显示数据。
+- UV 属于 Edge 在 Face 上的 occurrence/Pcurve，不属于全局三维点。
+- 调试对象 ID 只保证单个 Session/Run 内稳定。
+- TShape 地址只能用于同进程诊断，不能作为持久拓扑命名。
+- Viewer 不应默认偏移真实几何来区分重合边。
+
+## 旧版运行方式
+
+迁移期间仍可在仓库根目录启动旧版：
+
 ```bash
-python3 generate_closed_surfaces.py
+python3 -m http.server 5778
 ```
-运行完毕后文件将直接落入 `TestJson/closed-surfaces-sample.json`。
 
-## 文件与函数说明
+打开 <http://127.0.0.1:5778/index.html>。
 
-### 1. `constants.js`
-统一存放项目中的全局常量和配置项。
-- **变量说明**：
-  - `SAMPLE_DATA`: 内置的测试示例数据，包含三维坐标系下点 (points) 和边 (edges) 的默认数据，确保即使不上传文件也可以预览渲染效果。
-  - `OVERLAP_PALETTE`: 为重叠边提供的高对比度预设调色板，包含常用的高饱和度区分色彩。
-  - `DASH_PATTERNS`: 重叠边的虚线样式表。不同次序的重叠边会按照其中的样式（实线、短划、点线、划点等）来渲染，增强相互覆盖时的视觉辨识度。
+## 近期里程碑
 
-### 2. `parser.js`
-负责处理核心数据的 JSON 解析、三维环境包围盒计算以及重叠边检测和智能颜色分配逻辑。
-- **`numberOrThrow(value, fieldName)`**: 数据清洗辅助函数。校验给定值是否包含有效数字，如果存在非法值或 NaN 则抛出异常报错退出。
-- **`hashColor(id, index)`**: 备用选色函数。根据输入的字符串 ID 进行哈希计算提取出唯一的颜色特征值并转换为对应的 HSL 色相字符串。
-- **`computeBounds(points)`**: 计算所有输入点云在 3D 空间中的包围盒大小 (Bounding Box)，返回网格中心的三维坐标 (`center`) 以及适合的缩放半径 (`radius`) 用以初始视角调整和居中显示。
-- **`canonicalPointIdKey(pointIds)`**: 辅助函数，将连接两点的 ID 数组序列化生成统一的字典键，用于判断“正向”与“反向”点序列是否属于相同的物理连线。
-- **`buildOverlapGroups(edges)`**: 检测系统包含重叠边的功能核心。由于重叠边占据相同的起点和终点，它将共享同一物理路径的所有线段按类划分进入同一组，最终分配其排列顺序序号 (`overlapOrder`) 和组内总重数 (`overlapCount`)。
-- **`assignEdgeColors(edges)`**: 核心色彩分配算法。配合 `buildOverlapGroups`，使用 137.5°（黄金角）来动态生成各重叠组之间的主要基底色。对于多重内部连线，则在此基础色上按等分偏移分配三角色或互补色，并交替调整明度深浅，确保哪怕多达十条连线彼此靠近也不会视觉混淆。
-- **`parseModel(data)`**: 数据解析对外的核心入口。严格校验外部输入格式，读取数据节点、构建点位映射字典并在边缘数据上完成点连接逻辑生成渲染所需的一级信息集合，再同步触发建立重叠分组记录和动态颜色分配，返回打包为 `models` 对象交付给 Viewer。
+1. M0：协议、Scene Store、Renderer Registry 和工程界面。
+2. M1：SSE Bridge、旧 JSON adapter、搜索和 UV pane 迁移。
+3. M2：BREP/mesh、FCStd baseline 和世界坐标对齐。
+4. M3：Stripe、SurfData、CommonPoint 和圆角失败可视化。
 
-### 3. `viewer.js`
-核心三维投影运算与渲染引擎，向外导出主类 `EdgeViewer` 用以实现坐标体系转换、Canvas 2D 绘制呈现及鼠标事件的监听交互体系。
-- **`class EdgeViewer`**: 主控制器类
-  - **`constructor(canvasElement)`**: 引擎初始化，接收 Canvas 画布实例，建立 2D Web 绘图上下文、重置鼠标追踪及其拖拽缩放的相关几何状态标志位。
-  - **`bindEvents()`**: 监听画布上鼠标的降下（MouseDown）、移动和释放动作构成视界拖拽旋转指令，与鼠标滚轮行为绑定成比例的缩放率重调整指令。
-  - **`resize()`**: 辅助函数。通过 CSS 与设备的当前视窗宽高比按需映射 Canvas 的硬件像素尺寸。
-  - **`setModel(model)`**: 数据流入口。将解析封装完成并已带有包围盒属性的点组与线组注入当前实例状态树，初始化第一视角的居中与重绘过程。
-  - **`resetView()`**: 将所有空间旋转角 (X横转, Y竖转) 及当前观测缩放距重置到开局最佳计算比例。
-  - **`setLabelVisibility(visible)`**: 配置函数。启用或停用渲染线条中央字符标签标注（性能考虑或防止画面过于密集）。
-  - **`toggleLabelVisibility()`**: 控制逻辑开关并向内部 Canvas 主循环请求重新执行 `render()` 同步渲染效果。
-  - **`project(point)`**: 三维引擎基石——透视/正交映射。根据当前 `mode`，针对 3D 适用偏航矩阵并在 3D 空间上转换为带有透视深度的 2D `[x,y]`；针对 2D 参数空间使用带平移与缩放的正交映射（映射 `u, v` 坐标）。
-  - **`handleHitTest(clickPoint)`**: 支持双模式的射线检测机制，检测鼠标坐标周围 25px(基于 DPR 放缩) 内的投影线段进而完成边的点击选取交互。
-  - **`render()`**: 全局刷帧主循环系统，承担每帧更新的大任。对画板清空、重算缩放位移后，自底向上描绘网格、绘制选中高亮底色背景（亮黄）、画出主干线本体（利用内置的偏移算子产生虚线分岔），再依次覆盖绘制路径箭头、顶尖节点。
-  - **`offset3DPositions(positions, overlapOrder, overlapCount)`**: 利用当前重叠关系生成的特殊渲染微小偏移辅助函数，它可以在非 0 视差维度内错开原本并驾齐驱处于同一平面内的多条独立线段。
-  - **`drawEdgeLabelStaggered(points, edge)`**: 标签位置的冲突解决算子。为了让相互靠拢的多根线段文字标签彼此错落在其平行轨道两侧，依靠虚线分型的顺序重新定位 Canvas 文本坐标。支持自定义偏移数组 `labelOffsets` 实现鼠标拖离。
-  - **`getPolylinePointAtFraction(points, fraction)`**: 提取多边形上的定位点核心算法，能在无论由多少个控制点串联而成的折线大路线上计算出刚好到达百比之 n (例如中点 50%) 区段位置的三维物理坐标。
-  - **`drawLegend()`**: 叠加于最终画板之上的非旋转元素渲染器，静态绘制底栏状态图标；并注入图例包围盒供点击监听交互。
-  - **`roundRectPath(x, y, w, h, r)`**: 为 Canvas 框架自带方法缺失填充提供的带圆弧倒角矩形的贝塞尔连续绘制扩展路径。
-  - **`drawEndpoint(point, color)`**: 图形原子功能指令，在已投影完成的指定 2D 圆心绘制线段末端点及连接处。
-  - **`drawArrow(from, to, color)`**: 通过求取线段当前两点的倾角计算法向量，构造一个充满锐度感的三维方向箭头辅助指向标志。
-
-### 4. `main.js`
-系统交互和 DOM 操作主控枢纽，搭建前台界面骨架并连接数据解析器与渲染核心。
-- **`setStatus(message, type)`**: 管理器下方状态栏提示接口，可改变气泡内容与 CSS 色系反馈错误或者加载进度。
-- **`setStats(pointCount, edgeCount)`**: 负责统计点位数以及关联拓扑连边数，并通过文字直观呈现在页面计数板上。
-- **`updateLabelToggleButton()`**: 依照 `viewer.showLabels` 被同步的状态参数修改显示/隐藏标签按扭文字提示状态。
-- **双例化 Viewer**: 根据画布实例化 `viewer2D` 和 `viewer3D`，并通过挂载 `onSelectEdge` 回调执行双窗口互动。 
-- **`loadDataObject(rawData, sourceLabel)`**: 用户主动文件加载核心入口。不论是拖拽 JSON 时获得文件文本又或是预置数据请求完成，均将原数据交给 `parser` 生成 Model，随之初始化双 Viewer，检查冗余关系及调用一次状态刷新面板重置场景视角。
-- **`tryAutoLoad()`**: 基于 `fetch` 的初始化机制，页面访问首次利用同源探测轮询本地当前层级文件夹内是否直接存在 `edge-data.json` 或新版的 `edge-2d3d-sample.json`，若成功拿取数据，完成首页静默热加载。
-- 绑定全局检索按钮 `#searchInput` 的模糊匹配 `input` 过滤任务。
-
-### 5. `app.js`
-旧版本功能整合或用于测试的单文件大本营。在系统拆分之前，它作为原始入口完整包含了上述 `parser` 解析方法、包围盒检测、`EdgeViewer` 渲染以及 DOM 界面的绑定逻辑。虽然拆分后可能已被用于版本兼容备案 `[app.js v3]`，但其内部所有的函数方法集以及功能效用，均与模块化文件 (`constants.js`, `main.js`, `parser.js`, `viewer.js`) 的上述对应功能重合。
+完整系统架构见 [freecad-occt-debug-kit 架构文档](https://github.com/liyongzheng666/freecad-occt-debug-kit/blob/codex/occ-debug-agent-architecture/docs/occ-fillet-debug-agent-architecture.md)。M0 初始化时核对的依赖版本见 [docs/product-facts.md](docs/product-facts.md)。

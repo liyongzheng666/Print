@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/liyongzheng666/Print/protocol/event.schema.json",
+  "title": "Print geometry debug event",
+  "type": "object",
+  "required": ["schema_version", "session_id", "run_id", "seq", "op"],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "session_id": { "type": "string", "minLength": 1 },
+    "run_id": { "type": "string", "minLength": 1 },
+    "seq": { "type": "integer", "minimum": 0 },
+    "timestamp_ns": { "type": "integer", "minimum": 0 },
+    "op": {
+      "enum": [
+        "add",
+        "update",
+        "remove",
+        "clear_group",
+        "clear_scene",
+        "set_visibility",
+        "highlight",
+        "focus",
+        "note",
+        "run_end"
+      ]
+    },
+    "id": { "type": "string", "minLength": 1 },
+    "group": { "type": "string", "minLength": 1 },
+    "kind": {
+      "enum": [
+        "point",
+        "point_set",
+        "vector",
+        "polyline",
+        "curve",
+        "edge",
+        "wire",
+        "surface_patch",
+        "face",
+        "shape",
+        "bbox"
+      ]
+    },
+    "label": { "type": "string" },
+    "geometry": { "type": "object" },
+    "asset": { "$ref": "#/$defs/asset" },
+    "style": { "$ref": "#/$defs/style" },
+    "source": { "$ref": "#/$defs/source" },
+    "topology_ref": { "$ref": "#/$defs/topologyRef" },
+    "metadata": { "type": "object" },
+    "patch": { "type": "object" },
+    "include_protected": { "type": "boolean" },
+    "visible": { "type": "boolean" },
+    "target": {
+      "type": "object",
+      "required": ["type", "id"],
+      "properties": {
+        "type": { "enum": ["entity", "group"] },
+        "id": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "ids": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "level": {
+      "enum": ["info", "warning", "algorithm_failure", "capture_failure", "infrastructure_failure"]
+    },
+    "message": { "type": "string" },
+    "status": { "enum": ["succeeded", "failed", "aborted"] },
+    "summary": { "type": "object" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "op": { "const": "add" } } },
+      "then": { "required": ["id", "group", "kind"] }
+    },
+    {
+      "if": { "properties": { "op": { "const": "update" } } },
+      "then": { "required": ["id", "patch"] }
+    },
+    {
+      "if": { "properties": { "op": { "const": "remove" } } },
+      "then": { "required": ["id"] }
+    },
+    {
+      "if": { "properties": { "op": { "const": "clear_group" } } },
+      "then": { "required": ["group"] }
+    },
+    {
+      "if": { "properties": { "op": { "const": "set_visibility" } } },
+      "then": { "required": ["target", "visible"] }
+    },
+    {
+      "if": { "properties": { "op": { "const": "highlight" } } },
+      "then": { "required": ["ids"] }
+    },
+    {
+      "if": { "properties": { "op": { "const": "focus" } } },
+      "then": { "required": ["id"] }
+    },
+    {
+      "if": { "properties": { "op": { "const": "note" } } },
+      "then": { "required": ["level", "message"] }
+    },
+    {
+      "if": { "properties": { "op": { "const": "run_end" } } },
+      "then": { "required": ["status"] }
+    }
+  ],
+  "$defs": {
+    "asset": {
+      "type": "object",
+      "required": ["format", "path"],
+      "properties": {
+        "format": { "enum": ["occt-brep", "print-mesh"] },
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" }
+      },
+      "additionalProperties": false
+    },
+    "style": {
+      "type": "object",
+      "properties": {
+        "color": { "type": "string" },
+        "opacity": { "type": "number", "minimum": 0, "maximum": 1 },
+        "size": { "type": "number", "exclusiveMinimum": 0 },
+        "line_width": { "type": "number", "exclusiveMinimum": 0 },
+        "depth_mode": { "enum": ["normal", "xray"] },
+        "protected": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "file": { "type": "string" },
+        "line": { "type": "integer", "minimum": 1 },
+        "function": { "type": "string" },
+        "phase": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "topologyRef": {
+      "type": "object",
+      "properties": {
+        "freecad_object": { "type": "string" },
+        "freecad_element": { "type": "string" },
+        "mapped_element": { "type": "string" },
+        "occurrence_path": { "type": "string" },
+        "shape_type": { "type": "string" },
+        "orientation": { "enum": ["FORWARD", "REVERSED", "INTERNAL", "EXTERNAL"] },
+        "location_hash": { "type": "string" },
+        "runtime_tshape": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "unevaluatedProperties": false
+}

@@ -1,0 +1,83 @@
+import { SCHEMA_VERSION, type DebugEvent } from "../core/protocol/types";
+
+const envelope = {
+  schema_version: SCHEMA_VERSION,
+  session_id: "sample-session",
+  run_id: "run-0001",
+};
+
+export const sampleEvents: readonly DebugEvent[] = [
+  {
+    ...envelope,
+    seq: 1,
+    op: "add",
+    id: "baseline/body-bounds",
+    group: "baseline/Body",
+    kind: "bbox",
+    label: "Body 基准包围盒",
+    geometry: { min: [-5, -5, 0], max: [5, 5, 10] },
+    style: { color: "#858d82", opacity: 0.62, protected: true },
+    topology_ref: { freecad_object: "Body", shape_type: "SOLID", occurrence_path: "Body/Tip" },
+  },
+  {
+    ...envelope,
+    seq: 2,
+    op: "add",
+    id: "fillet/input/edge-3",
+    group: "fillet/selected-edges",
+    kind: "edge",
+    label: "选中边 Edge3",
+    geometry: { points: [[5, -5, 0], [5, -5, 10]] },
+    style: { color: "#e0a34e", line_width: 2 },
+    source: {
+      file: "src/BRepFilletAPI/BRepFilletAPI_MakeFillet.cxx",
+      line: 527,
+      function: "BRepFilletAPI_MakeFillet::Build",
+      phase: "input",
+    },
+    topology_ref: {
+      freecad_object: "Pad",
+      freecad_element: "Edge3",
+      occurrence_path: "Body/Pad/Solid1/Edge3",
+      shape_type: "EDGE",
+      orientation: "FORWARD",
+    },
+    metadata: { radius: 2, tolerance: 1e-7, curve_type: "Geom_Line" },
+  },
+  {
+    ...envelope,
+    seq: 3,
+    op: "add",
+    id: "fillet/stripe-1/spine",
+    group: "fillet/stripe/1/spine",
+    kind: "polyline",
+    label: "Stripe 1 Spine",
+    geometry: { points: [[5, -5, 0], [5, -5, 3], [5, -5, 7], [5, -5, 10]] },
+    style: { color: "#78b6a3", line_width: 2 },
+    source: {
+      file: "src/ChFi3d/ChFi3d_Builder.cxx",
+      line: 239,
+      function: "ChFi3d_Builder::Compute",
+      phase: "perform-set-of-surface",
+    },
+    metadata: { stripe_index: 1, first_parameter: 0, last_parameter: 10 },
+  },
+  {
+    ...envelope,
+    seq: 4,
+    op: "add",
+    id: "fillet/stripe-1/common-point-1",
+    group: "fillet/stripe/1/common-points",
+    kind: "point",
+    label: "公共点 P1",
+    geometry: { position: [5, -5, 3] },
+    style: { color: "#e8bd6b", size: 0.28, depth_mode: "xray" },
+    source: {
+      file: "src/ChFi3d/ChFi3d_Builder_0.cxx",
+      line: 1722,
+      function: "ChFi3d_Builder::ComputeData",
+      phase: "compute-data",
+    },
+    metadata: { tolerance: 0.0001, uv_on_s1: [0.25, 0.5], uv_on_s2: [0.75, 0.5] },
+  },
+];
