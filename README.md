@@ -42,7 +42,7 @@ Capture 动态库只需一次构建和加载；之后无论右键发送还是手
 
 “发送到 Print”是用户操作语义，扩展不会把进程内 C++ 对象直接通过 HTTP 交给浏览器。实际路径仍是 `CodeLLDB → occdbg/Capture → Session → Bridge → Print`，因此 Bridge 或 Viewer 暂时离线时事件仍可落盘，并在重连后恢复。右键菜单、frame 跟踪、类型识别和 F5 编排属于 Kit；Print 保持纯协议消费者。
 
-小几何以内联事件写入 `events.ndjson`，Face/Shape 等大几何写为 BREP 资产并由事件引用。Bridge 负责 tail NDJSON、将 BREP 异步转换为显示 Mesh，并通过 SSE 推送给当前 Scene Store。
+小几何以内联事件写入 `events.ndjson`，Face/Shape 等大几何写为 BREP 资产并由事件引用。BREP→显示 Mesh 的三角化由 Kit 生产端（`occ-debug-mesh`，与被调试进程同一 OCCT ABI）在写入资产时完成；Bridge 只负责 tail NDJSON、静态托管 `assets/`（含 BREP 与派生 mesh），并通过 SSE 推送给当前 Scene Store——Bridge 不调用 Kit 二进制，Print 保持纯消费。完整接缝见 [Kit 联动技术选型](https://github.com/liyongzheng666/freecad-occt-debug-kit/blob/main/docs/print-linkage-tech-decisions.md)。
 
 事件可以在 `metadata.producer` 中标明来源：
 
