@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/liyongzheng666/Print/protocol/print-mesh.schema.json",
+  "title": "Print derived mesh asset (occ-debug-mesh output)",
+  "description": "Triangulated, per-face mesh derived from a captured BREP. Coordinates are world-space doubles; the single session-level local_origin (manifest) is subtracted by the viewer before downcasting to Float32. Carries no per-asset origin.",
+  "type": "object",
+  "required": ["format_version", "unit"],
+  "properties": {
+    "format_version": { "const": "1.0" },
+    "unit": { "enum": ["mm", "cm", "m", "in"] },
+    "partial": {
+      "type": "boolean",
+      "default": false,
+      "description": "true when some faces could not be tessellated (broken shape)."
+    },
+    "failed_faces": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "face_id list that failed to mesh; pairs with partial=true."
+    },
+    "faces": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/face" },
+      "description": "Per-face submeshes. Empty/absent for bare Edge/Wire inputs."
+    },
+    "edges": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/edge" },
+      "description": "Edge polylines (also the only payload for bare Edge/Wire inputs)."
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "face": {
+      "type": "object",
+      "required": ["face_id", "positions", "indices"],
+      "properties": {
+        "face_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "TopExp::MapShapes index key, shared with the event topology_ref."
+        },
+        "orientation": {
+          "enum": ["FORWARD", "REVERSED", "INTERNAL", "EXTERNAL"],
+          "description": "Drives normal direction; REVERSED / mirror Location flips winding."
+        },
+        "positions": {
+          "type": "array",
+          "items": { "type": "number" },
+          "description": "Flat world-coordinate doubles [x,y,z, ...] (length a multiple of 3)."
+        },
+        "indices": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 0 },
+          "description": "Triangle vertex indices into positions/3 (length a multiple of 3); viewer builds a Uint32 index."
+        },
+        "normals": {
+          "type": "array",
+          "items": { "type": "number" },
+          "description": "Optional per-vertex normals [nx,ny,nz, ...] aligned with positions; recomputed by the viewer if absent."
+        }
+      },
+      "additionalProperties": false
+    },
+    "edge": {
+      "type": "object",
+      "required": ["edge_id", "points"],
+      "properties": {
+        "edge_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "TopExp::MapShapes index key, shared with the event topology_ref."
+        },
+        "points": {
+          "type": "array",
+          "items": { "type": "number" },
+          "description": "Flat world-coordinate doubles polyline [x,y,z, ...] (length a multiple of 3)."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
