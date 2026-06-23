@@ -171,7 +171,8 @@
             "degenerate",
             "non_manifold",
             "invalid_pcurve",
-            "walking_failure"
+            "walking_failure",
+            "other"
           ]
         },
         "source": { "enum": ["brepcheck", "bopcheck", "chfi3d"] },

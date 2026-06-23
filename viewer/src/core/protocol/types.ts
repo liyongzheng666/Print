@@ -42,7 +42,8 @@ export type DefectCategory =
   | "degenerate"
   | "non_manifold"
   | "invalid_pcurve"
-  | "walking_failure";
+  | "walking_failure"
+  | "other";
 
 export interface DefectRef {
   readonly entity_id?: string;
