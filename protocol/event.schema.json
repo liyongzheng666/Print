@@ -175,7 +175,7 @@
             "other"
           ]
         },
-        "source": { "enum": ["brepcheck", "bopcheck", "chfi3d"] },
+        "source": { "enum": ["brepcheck", "bopcheck", "chfi3d", "topology"] },
         "severity": { "enum": ["error", "warning"] },
         "status": { "type": "string", "description": "raw OCCT status code, e.g. BRepCheck_SelfIntersectingWire" },
         "message": { "type": "string" },

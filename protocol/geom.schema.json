@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/liyongzheng666/Print/protocol/geom.schema.json",
+  "title": "occ-debug-mesh geometry/topology sidecar (P0a)",
+  "description": "Topology + geometry derived from a captured BREP, alongside the render mesh. Vertices+tolerance, curve/surface classification, UV bounds + periodicity, edge flags/range/adjacency, and pcurves (UV parameter-space polylines; a seam edge carries two, a degenerate/pole edge still carries one). 3D in world coordinates; uv in the owning face's parameter space. See docs/occ-debug-mesh-export-design.md.",
+  "type": "object",
+  "required": ["format_version", "unit"],
+  "properties": {
+    "format_version": { "const": "1.0" },
+    "unit": { "enum": ["mm", "cm", "m", "in"] },
+    "vertices": { "type": "array", "items": { "$ref": "#/$defs/vertex" } },
+    "edges": { "type": "array", "items": { "$ref": "#/$defs/edge" } },
+    "faces": { "type": "array", "items": { "$ref": "#/$defs/face" } }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "vertex": {
+      "type": "object",
+      "required": ["id", "point", "tolerance"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "description": "TopExp::MapShapes(VERTEX) index key, e.g. V1." },
+        "point": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3, "description": "World [x,y,z]." },
+        "tolerance": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "edge": {
+      "type": "object",
+      "required": ["id", "curve_type", "tolerance", "range", "degenerate", "same_parameter", "closed", "adjacent_faces", "pcurves"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "description": "Shares the MapShapes(EDGE) index with the mesh edge_id." },
+        "curve_type": {
+          "enum": ["line", "circle", "ellipse", "hyperbola", "parabola", "bezier", "bspline", "offset", "other", "none"],
+          "description": "BRepAdaptor_Curve::GetType(); 'none' when the edge has no 3D curve (degenerate / pure-pcurve)."
+        },
+        "tolerance": { "type": "number", "minimum": 0 },
+        "range": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2, "description": "3D curve parameter [first,last]." },
+        "degenerate": { "type": "boolean", "description": "BRep_Tool::Degenerated; true at sphere/cone poles (no 3D curve, UV boundary only)." },
+        "same_parameter": { "type": "boolean" },
+        "closed": { "type": "boolean" },
+        "start_vertex": { "type": "string", "minLength": 1 },
+        "end_vertex": { "type": "string", "minLength": 1 },
+        "adjacent_faces": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Distinct face_id list (a seam edge's two uses on one face dedup to a single id). Length heuristic: 2=manifold, >2=non-manifold; length 1 means free/boundary ONLY when not a seam -- a seam edge also yields length 1, so detect free edges by combining length 1 with closed=false / is_seam=false, never by length alone." },
+        "pcurves": { "type": "array", "items": { "$ref": "#/$defs/pcurve" } },
+        "control": { "$ref": "#/$defs/control" }
+      },
+      "additionalProperties": false
+    },
+    "pcurve": {
+      "type": "object",
+      "required": ["face_id", "is_seam", "index", "uv"],
+      "properties": {
+        "face_id": { "type": "string", "minLength": 1 },
+        "is_seam": { "type": "boolean", "description": "true when the edge is a seam on this face (closed/periodic surface); then two pcurves exist (index 1 and 2)." },
+        "index": { "type": "integer", "minimum": 1, "description": "1 for the forward pcurve; 2 for the seam's reversed-side pcurve." },
+        "uv": { "type": "array", "items": { "type": "number" }, "description": "Flat parameter-space polyline [u,v, ...] (length a multiple of 2)." }
+      },
+      "additionalProperties": false
+    },
+    "face": {
+      "type": "object",
+      "required": ["id", "surface_type", "uv_bounds", "periodic_u", "periodic_v", "closed_u", "closed_v", "tolerance"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "description": "Shares the MapShapes(FACE) index with the mesh face_id." },
+        "surface_type": {
+          "enum": ["plane", "cylinder", "cone", "sphere", "torus", "bezier", "bspline", "revolution", "extrusion", "offset", "other"],
+          "description": "BRepAdaptor_Surface::GetType()."
+        },
+        "uv_bounds": { "type": "array", "items": { "type": "number" }, "minItems": 4, "maxItems": 4, "description": "[umin,umax,vmin,vmax] from BRepTools::UVBounds." },
+        "periodic_u": { "type": "boolean" },
+        "periodic_v": { "type": "boolean" },
+        "closed_u": { "type": "boolean" },
+        "closed_v": { "type": "boolean" },
+        "tolerance": { "type": "number", "minimum": 0 },
+        "control": { "$ref": "#/$defs/control" }
+      },
+      "additionalProperties": false
+    },
+    "control": {
+      "type": "object",
+      "description": "NURBS control net (only for bspline curve/surface). Poles in WORLD coords; surface poles row-major (u outer, v inner), length nb_u*nb_v; curve poles length nb_u (nb_v=0).",
+      "required": ["degree_u", "degree_v", "nb_u", "nb_v", "rational", "periodic_u", "periodic_v", "poles"],
+      "properties": {
+        "degree_u": { "type": "integer", "minimum": 0 },
+        "degree_v": { "type": "integer", "minimum": 0 },
+        "nb_u": { "type": "integer", "minimum": 0 },
+        "nb_v": { "type": "integer", "minimum": 0 },
+        "rational": { "type": "boolean" },
+        "periodic_u": { "type": "boolean" },
+        "periodic_v": { "type": "boolean" },
+        "poles": { "type": "array", "items": { "type": "number" }, "description": "Flat world xyz (length a multiple of 3)." },
+        "weights": { "type": "array", "items": { "type": "number" } }
+      },
+      "additionalProperties": false
+    }
+  }
+}
