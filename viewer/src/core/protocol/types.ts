@@ -93,6 +93,14 @@ export interface BoundingBoxGeometry {
   readonly max: Vec3;
 }
 
+/** Inline triangle mesh for a `face`/`surface_patch`/`shape` entity; flat
+ *  world-coordinate arrays (same layout as a print-mesh face). */
+export interface MeshGeometry {
+  readonly positions: readonly number[];
+  readonly indices: readonly number[];
+  readonly normals?: readonly number[];
+}
+
 export interface AssetRef {
   readonly format: "occt-brep" | "print-mesh";
   readonly path: string;
@@ -138,6 +146,7 @@ export type InlineGeometry =
   | PolylineGeometry
   | VectorGeometry
   | BoundingBoxGeometry
+  | MeshGeometry
   | Readonly<Record<string, unknown>>;
 
 export interface SceneEntity {

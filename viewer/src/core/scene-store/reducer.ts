@@ -157,6 +157,13 @@ export function reduceScene(currentState: SceneState, event: DebugEvent): SceneS
   }
 }
 
+/** A group is locked (survives 清空) if the user set it so; otherwise baseline
+ *  groups default to locked. Lets any group be locked/unlocked, not just bbox. */
+export function isGroupLocked(group: string, locked: Readonly<Record<string, boolean>>): boolean {
+  if (group in locked) return locked[group];
+  return group === "baseline" || group.startsWith("baseline/");
+}
+
 export function isGroupVisible(group: string, visibility: Readonly<Record<string, boolean>>): boolean {
   const parts = group.split("/");
   for (let index = 1; index <= parts.length; index += 1) {

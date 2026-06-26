@@ -137,9 +137,11 @@ export function Inspector() {
           <section className="inspector-section">
             <h2>元数据</h2>
             <dl>
-              {Object.entries(entity.metadata ?? {}).map(([key, value]) => (
-                <DataRow key={key} label={key} value={value} />
-              ))}
+              {Object.entries(entity.metadata ?? {})
+                .filter(([key]) => key !== "uv")
+                .map(([key, value]) => (
+                  <DataRow key={key} label={key} value={value} />
+                ))}
             </dl>
           </section>
           <div className="inspector-actions">
