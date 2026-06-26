@@ -280,23 +280,38 @@ button {
   font-size: 8px;
 }
 
+.lock-toggle {
+  padding: 1px 4px;
+  border: 1px solid transparent;
+  color: var(--text-faint);
+  background: transparent;
+  font-size: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.lock-toggle:hover {
+  color: var(--text);
+}
+
+.lock-toggle.locked {
+  color: #d5b476;
+  border-color: #4c5349;
+}
+
 .entity-list {
   padding: 3px 0 5px;
 }
 
 .entity-row {
   display: grid;
-  grid-template-columns: 52px minmax(0, 1fr);
+  grid-template-columns: 32px minmax(0, 1fr);
   width: 100%;
   min-height: 27px;
   align-items: center;
   gap: 6px;
-  padding: 0 10px 0 20px;
-  border: 0;
+  padding: 0 10px 0 14px;
   color: var(--text-dim);
-  background: transparent;
-  text-align: left;
-  cursor: pointer;
 }
 
 .entity-row:hover {
@@ -307,6 +322,23 @@ button {
   color: var(--text);
   background: #34382f;
   box-shadow: inset 2px 0 0 var(--amber);
+}
+
+.entity-select {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 6px;
+  min-height: 27px;
+  align-items: center;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.entity-select.entity-hidden {
+  opacity: 0.4;
 }
 
 .entity-kind {
@@ -484,6 +516,36 @@ button {
     linear-gradient(#2b2f29 1px, transparent 1px),
     linear-gradient(90deg, #2b2f29 1px, transparent 1px);
   background-size: 22px 22px;
+}
+
+.uv-panels {
+  display: flex;
+  gap: 10px;
+  height: 100%;
+  padding: 6px 10px;
+  overflow: auto;
+  align-items: flex-start;
+}
+
+.uv-plot {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+}
+
+.uv-plot-head {
+  color: #aeb5ab;
+  font-family: var(--mono);
+  font-size: 10px;
+  margin-bottom: 2px;
+}
+
+.uv-svg {
+  display: block;
+  height: calc(100% - 16px);
+  width: auto;
+  aspect-ratio: 1 / 1;
 }
 
 .uv-axis {

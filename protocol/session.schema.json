@@ -23,6 +23,13 @@
     "occt_version": { "type": "string" },
     "occt_revision": { "type": "string" },
     "print_revision": { "type": "string" },
+    "local_origin": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 3,
+      "maxItems": 3,
+      "description": "Single session-level world-coordinate offset (e.g. baseline bbox center). The viewer subtracts it from all double coordinates before downcasting to Float32 (M2-6)."
+    },
     "baseline": {
       "type": "object",
       "properties": {

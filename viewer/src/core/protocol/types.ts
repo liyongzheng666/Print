@@ -14,7 +14,8 @@ export type GeometryKind =
   | "surface_patch"
   | "face"
   | "shape"
-  | "bbox";
+  | "bbox"
+  | "defect";
 
 export interface SourceLocation {
   readonly file?: string;
@@ -32,6 +33,31 @@ export interface TopologyRef {
   readonly orientation?: "FORWARD" | "REVERSED" | "INTERNAL" | "EXTERNAL";
   readonly location_hash?: string;
   readonly runtime_tshape?: string;
+}
+
+export type DefectCategory =
+  | "self_intersection"
+  | "open_boundary"
+  | "twisted_surface"
+  | "degenerate"
+  | "non_manifold"
+  | "invalid_pcurve"
+  | "walking_failure"
+  | "other";
+
+export interface DefectRef {
+  readonly entity_id?: string;
+  readonly face_id?: string;
+  readonly edge_id?: string;
+}
+
+export interface DefectInfo {
+  readonly category: DefectCategory;
+  readonly source: "brepcheck" | "bopcheck" | "chfi3d";
+  readonly severity: "error" | "warning";
+  readonly status?: string;
+  readonly message?: string;
+  readonly ref?: DefectRef;
 }
 
 export interface EntityStyle {
@@ -67,10 +93,51 @@ export interface BoundingBoxGeometry {
   readonly max: Vec3;
 }
 
+/** Inline triangle mesh for a `face`/`surface_patch`/`shape` entity; flat
+ *  world-coordinate arrays (same layout as a print-mesh face). */
+export interface MeshGeometry {
+  readonly positions: readonly number[];
+  readonly indices: readonly number[];
+  readonly normals?: readonly number[];
+}
+
 export interface AssetRef {
   readonly format: "occt-brep" | "print-mesh";
   readonly path: string;
   readonly sha256?: string;
+}
+
+export type Unit = "mm" | "cm" | "m" | "in";
+
+/** Parsed print-mesh asset (occ-debug-mesh output); world-coordinate doubles. */
+export interface MeshFace {
+  readonly face_id: string;
+  readonly orientation?: "FORWARD" | "REVERSED" | "INTERNAL" | "EXTERNAL";
+  readonly positions: readonly number[];
+  readonly indices: readonly number[];
+  readonly normals?: readonly number[];
+}
+
+export interface MeshEdge {
+  readonly edge_id: string;
+  readonly points: readonly number[];
+}
+
+export interface PrintMeshAsset {
+  readonly format_version: "1.0";
+  readonly unit: Unit;
+  readonly partial?: boolean;
+  readonly failed_faces?: readonly string[];
+  readonly faces?: readonly MeshFace[];
+  readonly edges?: readonly MeshEdge[];
+}
+
+/** Session-level metadata the viewer needs (from manifest.json). */
+export interface SessionInfo {
+  readonly session_id: string;
+  readonly unit: Unit;
+  /** World-coordinate offset subtracted before Float32 downcast (M2-6). */
+  readonly local_origin?: Vec3;
 }
 
 export type InlineGeometry =
@@ -79,6 +146,7 @@ export type InlineGeometry =
   | PolylineGeometry
   | VectorGeometry
   | BoundingBoxGeometry
+  | MeshGeometry
   | Readonly<Record<string, unknown>>;
 
 export interface SceneEntity {
@@ -92,6 +160,7 @@ export interface SceneEntity {
   readonly style?: EntityStyle;
   readonly source?: SourceLocation;
   readonly topology_ref?: TopologyRef;
+  readonly defect?: DefectInfo;
   readonly metadata?: Readonly<Record<string, unknown>>;
 }
 
@@ -183,6 +252,7 @@ export function entityFromAddEvent(event: AddEvent): SceneEntity {
     style: event.style,
     source: event.source,
     topology_ref: event.topology_ref,
+    defect: event.defect,
     metadata: event.metadata,
   };
 }

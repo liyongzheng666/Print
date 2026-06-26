@@ -1,6 +1,8 @@
 import {
+  AmbientLight,
   Box3,
   Color,
+  DirectionalLight,
   GridHelper,
   Group,
   PerspectiveCamera,
@@ -13,6 +15,7 @@ import {
   type Object3D,
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
 import type { SceneEntity } from "../core/protocol/types";
 import { createBasicRendererRegistry, disposeObjectMaterial } from "./renderers/basicRenderers";
 
@@ -43,6 +46,16 @@ export class SceneController {
     const grid = new GridHelper(40, 40, "#4a5048", "#292c28");
     grid.rotation.x = Math.PI / 2;
     this.scene.add(grid);
+
+    // Lights for shaded faces (MeshStandardMaterial); line/point materials are
+    // unlit and unaffected. Z-up scene, so place the key light high in +Z.
+    this.scene.add(new AmbientLight("#ffffff", 1.4));
+    const key = new DirectionalLight("#ffffff", 2.2);
+    key.position.set(0.6, -1, 1.6);
+    this.scene.add(key);
+    const fill = new DirectionalLight("#cdd6e6", 0.8);
+    fill.position.set(-1, 0.8, -0.5);
+    this.scene.add(fill);
 
     this.camera.position.set(13, -16, 12);
     this.camera.up.set(0, 0, 1);
@@ -76,6 +89,20 @@ export class SceneController {
       this.objects.set(entity.id, object);
       this.entityRoot.add(object);
     }
+    this.updateLineResolution();  // fat lines (Line2) need canvas-size resolution
+  }
+
+  // Keep every Line2/LineMaterial's resolution matched to the canvas, or the
+  // pixel linewidth renders wrong. Called on sync (new lines) and on resize.
+  private updateLineResolution(): void {
+    const size = new Vector2();
+    this.renderer.getSize(size);
+    this.entityRoot.traverse((object) => {
+      const material = "material" in object ? (object as { material?: unknown }).material : undefined;
+      if (material && (material as { isLineMaterial?: boolean }).isLineMaterial) {
+        (material as LineMaterial).resolution.set(size.x, size.y);
+      }
+    });
   }
 
   setXray(enabled: boolean): void {
@@ -149,6 +176,7 @@ export class SceneController {
     this.renderer.setSize(width, height, false);
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
+    this.updateLineResolution();
   }
 
   private animate = (): void => {

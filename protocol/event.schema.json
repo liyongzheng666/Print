@@ -38,7 +38,8 @@
         "surface_patch",
         "face",
         "shape",
-        "bbox"
+        "bbox",
+        "defect"
       ]
     },
     "label": { "type": "string" },
@@ -47,6 +48,7 @@
     "style": { "$ref": "#/$defs/style" },
     "source": { "$ref": "#/$defs/source" },
     "topology_ref": { "$ref": "#/$defs/topologyRef" },
+    "defect": { "$ref": "#/$defs/defect" },
     "metadata": { "type": "object" },
     "patch": { "type": "object" },
     "include_protected": { "type": "boolean" },
@@ -154,6 +156,38 @@
         "orientation": { "enum": ["FORWARD", "REVERSED", "INTERNAL", "EXTERNAL"] },
         "location_hash": { "type": "string" },
         "runtime_tshape": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "defect": {
+      "type": "object",
+      "required": ["category", "source", "severity"],
+      "properties": {
+        "category": {
+          "enum": [
+            "self_intersection",
+            "open_boundary",
+            "twisted_surface",
+            "degenerate",
+            "non_manifold",
+            "invalid_pcurve",
+            "walking_failure",
+            "other"
+          ]
+        },
+        "source": { "enum": ["brepcheck", "bopcheck", "chfi3d", "topology"] },
+        "severity": { "enum": ["error", "warning"] },
+        "status": { "type": "string", "description": "raw OCCT status code, e.g. BRepCheck_SelfIntersectingWire" },
+        "message": { "type": "string" },
+        "ref": {
+          "type": "object",
+          "properties": {
+            "entity_id": { "type": "string", "minLength": 1 },
+            "face_id": { "type": "string", "minLength": 1 },
+            "edge_id": { "type": "string", "minLength": 1 }
+          },
+          "additionalProperties": false
+        }
       },
       "additionalProperties": false
     }
