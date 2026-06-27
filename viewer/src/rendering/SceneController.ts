@@ -16,8 +16,14 @@ import {
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
-import type { SceneEntity } from "../core/protocol/types";
+import type { MeshGeometry, SceneEntity } from "../core/protocol/types";
+import { MeshAssetLoader } from "./meshAsset";
 import { createBasicRendererRegistry, disposeObjectMaterial } from "./renderers/basicRenderers";
+
+function hasInlineMesh(entity: SceneEntity): boolean {
+  const geometry = entity.geometry as MeshGeometry | undefined;
+  return Boolean(geometry?.positions?.length && geometry.indices?.length);
+}
 
 export class SceneController {
   private readonly scene = new Scene();
@@ -30,9 +36,12 @@ export class SceneController {
   private readonly raycaster = new Raycaster();
   private readonly pointer = new Vector2();
   private readonly resizeObserver: ResizeObserver;
+  private readonly meshLoader = new MeshAssetLoader();
+  private lastEntities: readonly SceneEntity[] = [];
   private frameHandle = 0;
   private xray = false;
   private onSelect: (id: string | null) => void = () => undefined;
+  private onDiagnostic: (message: string) => void = () => undefined;
 
   constructor(private readonly container: HTMLElement) {
     this.renderer = new WebGLRenderer({ antialias: true, alpha: false });
@@ -74,7 +83,12 @@ export class SceneController {
     this.onSelect = handler;
   }
 
+  setDiagnosticHandler(handler: (message: string) => void): void {
+    this.onDiagnostic = handler;
+  }
+
   sync(entities: readonly SceneEntity[]): void {
+    this.lastEntities = entities;
     const nextIds = new Set(entities.map((entity) => entity.id));
     for (const [id, object] of this.objects) {
       if (!nextIds.has(id)) this.removeObject(id, object);
@@ -83,13 +97,39 @@ export class SceneController {
     for (const entity of entities) {
       const previous = this.objects.get(entity.id);
       if (previous) this.removeObject(entity.id, previous);
-      const object = this.registry.get(entity.kind)?.create(entity) ?? null;
+      const renderEntity = this.resolveMeshAsset(entity);
+      const object = this.registry.get(renderEntity.kind)?.create(renderEntity) ?? null;
       if (!object) continue;
       this.applyDepthMode(object);
       this.objects.set(entity.id, object);
       this.entityRoot.add(object);
     }
     this.updateLineResolution();  // fat lines (Line2) need canvas-size resolution
+  }
+
+  // Async placeholder upgrade (M2-1 plan A): a mesh-kind entity whose `update`
+  // points at a print-mesh asset has no inline triangles. Fetch + cache the
+  // asset off the main path; render the placeholder (bbox) now, and re-sync to
+  // swap in the real mesh once it lands. Cross-cut so the renderers stay pure.
+  private resolveMeshAsset(entity: SceneEntity): SceneEntity {
+    const asset = entity.asset;
+    if (!asset || asset.format !== "print-mesh" || hasInlineMesh(entity)) return entity;
+
+    const mesh = this.meshLoader.get(asset);
+    if (mesh) return { ...entity, geometry: mesh };
+
+    if (!this.meshLoader.isSettled(asset)) {
+      this.meshLoader
+        .load(asset)
+        .then((loaded) => {
+          if (loaded) this.sync(this.lastEntities);  // swap placeholder -> mesh
+        })
+        .catch((error: unknown) => {
+          const detail = error instanceof Error ? error.message : String(error);
+          this.onDiagnostic(`网格资产加载失败 ${asset.path}：${detail}`);
+        });
+    }
+    return entity;  // placeholder bbox until the mesh arrives
   }
 
   // Keep every Line2/LineMaterial's resolution matched to the canvas, or the

@@ -28,6 +28,7 @@ export function Viewport3D({ xray }: Viewport3DProps) {
     if (!containerRef.current) return;
     const controller = new SceneController(containerRef.current);
     controller.setSelectionHandler(selectEntity);
+    controller.setDiagnosticHandler((message) => useSceneStore.getState().noteDiagnostic(message));
     controllerRef.current = controller;
     return () => {
       controller.dispose();
